@@ -1,26 +1,22 @@
 const mongoose = require('mongoose');
-const { dbUriDev, dbUriProd ,env} = require('./env.config.js');
+const { dbUriDev, dbUriProd, env } = require('./env.config.js');
+
 class Database {
     constructor() {
         if (!Database.instance) {
             Database.instance = this;
             this.connect();
         }
-    
         return Database.instance;
     }
-     async connect() {
+
+    async connect() {
         try {
-            console.log(env);
             const dbUri = env === 'dev' ? dbUriDev : dbUriProd;
-            await mongoose.connect(dbUri, {
-                useNewUrlParser: true,
-                useUnifiedTopology: true,
-            });
-            console.log('Database connection successful');
-        }
-        catch (error) {
-            console.error('Database connection error');
+            await mongoose.connect(dbUri);
+            console.log('✅ Database connection successful');
+        } catch (error) {
+            console.error('❌ Database connection error:', error);
         }
     }
 }
