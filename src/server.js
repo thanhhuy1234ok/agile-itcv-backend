@@ -3,12 +3,20 @@ const {port} =require('./configs/env.config.js');
 const mainRouter =  require('./routers/index.js');
 require('./configs/db.config.js');
 const app = express();
-const bcrypt = require('./utils/bcrypt.password.js');
+const cors = require('cors');
+
+
+app.use(cors({
+    origin: 'http://localhost:3000', // Chỉ cho phép từ FE ở port 3000
+    methods: ['GET', 'POST', 'PUT','PATCH', 'DELETE'],
+    credentials: true // Nếu cần gửi cookie qua cross-origin
+}));
 
 app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
+
 app.use('/api/v1', mainRouter);
 
 
