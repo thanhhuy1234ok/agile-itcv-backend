@@ -1,4 +1,6 @@
-const authService = require('../services/auth.service')
+const ms = require('ms');
+const authService = require('../services/auth.service');
+const { jwtRefreshExpire } = require('../configs/env.config');
 
 const create = async (req, res) => {
     try {
@@ -22,11 +24,18 @@ const login = async (req, res) => {
             return res.status(400).json({ message: 'Email và mật khẩu là bắt buộc' });
         }
 
-        const { user, accessToken } = await authService.loginUser(email, password);
+        const { user, accessToken ,refreshToken} = await authService.loginUser(email, password);
+
+        res.cookie('refresh_Token', refreshToken, {
+            httpOnly: true,
+            maxAge: ms(jwtRefreshExpire)
+        });
+
         return res.status(200).json({
             message: 'Đăng nhập thành công',
+            access_Token: accessToken,
+            refresh_Token: refreshToken,
             data: user,
-            accessToken
         });
     } catch (error) {
         console.error(error);

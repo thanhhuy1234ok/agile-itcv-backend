@@ -4,6 +4,7 @@ const mainRouter =  require('./routers/index.js');
 require('./configs/db.config.js');
 const app = express();
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 
 app.use(cors({
@@ -11,6 +12,8 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT','PATCH', 'DELETE'],
     credentials: true // Nếu cần gửi cookie qua cross-origin
 }));
+
+app.use(cookieParser());
 
 app.use(express.json());
 

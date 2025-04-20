@@ -1,7 +1,7 @@
 const encode_bcrypt = require('../utils/bcrypt.password.js');
 const User = require('../schema/user.schema.js');
 const UserFactory = require('../factories/UserFactory.js');
-const createAccessToken = require('../utils/jwt.js')
+const { createAccessToken, createRefreshToken } = require('../utils/jwt.js')
 
 const createUser = async (userData) => {
     try {
@@ -56,11 +56,19 @@ const loginUser = async (email, password) => {
             throw new Error('Mật khẩu không đúng');
         }
 
-        const accessToken = createAccessToken(user);
+        const payload = {
+            userId: user._id,
+            email: user.email,
+            role: user.role,
+        };
+
+        const accessToken = createAccessToken(payload);
+        const refreshToken = createRefreshToken(payload);
 
         return {
+            accessToken,
+            refreshToken,
             user,
-            accessToken
         };
     } catch (error) {
         console.error('Lỗi khi đăng nhập:', error.message);
