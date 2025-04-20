@@ -1,7 +1,7 @@
 const encode_bcrypt = require('../utils/bcrypt.password.js');
 const User = require('../schema/user.schema.js');
 const UserFactory = require('../factories/UserFactory.js');
-const { createAccessToken, createRefreshToken } = require('../utils/jwt.js')
+const { createAccessToken, createRefreshToken, verifyRefreshToken } = require('../utils/jwt.js')
 
 const createUser = async (userData) => {
     try {
@@ -76,7 +76,27 @@ const loginUser = async (email, password) => {
     }
 };
 
+const getNewAccessToken = async (refreshToken) => {
+    try {
+        if (!refreshToken) {
+            throw new Error('Refresh token là bắt buộc');
+        }
+
+        const decoded = verifyRefreshToken(refreshToken);
+
+        return createAccessToken({
+            userId: decoded.userId,
+            email: decoded.email,
+            role: decoded.role,
+        });
+    } catch (error) {
+        console.error('Lỗi khi làm mới access token:', error.message);
+        throw new Error(error.message);
+    }
+};
+
 module.exports = {
     createUser,
     loginUser,
+    getNewAccessToken
 };

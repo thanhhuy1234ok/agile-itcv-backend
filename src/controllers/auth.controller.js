@@ -43,7 +43,25 @@ const login = async (req, res) => {
     }
 };
 
+const refreshAccessToken = async (req, res) => {
+    try {
+        const refreshToken = req.cookies.refresh_Token;
+        if (!refreshToken) {
+            return res.status(400).json({ message: 'Refresh token là bắt buộc' });
+        }
+
+        const accessToken = await authService.getNewAccessToken(refreshToken);
+        
+        return res.status(200).json({ access_Token: accessToken });
+    } catch (error) {
+        console.error(error);
+        return res.status(401).json({ message: error.message });
+    }
+};
+
+
 module.exports = {
     create,
-    login
+    login,
+    refreshAccessToken
 };
