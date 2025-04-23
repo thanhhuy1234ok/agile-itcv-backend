@@ -7,13 +7,14 @@ const create = async (req, res) => {
         const newUser = await authService.createUser(req.body);
 
         return res.status(201).json({
+            code: 1,
             message: 'Đăng ký thành công',
             data: newUser,
         });
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ code: 0, message: error.message });
     }
 };
 
@@ -21,7 +22,7 @@ const login = async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
-            return res.status(400).json({ message: 'Email và mật khẩu là bắt buộc' });
+            return res.status(400).json({ code: 0, message: 'Email và mật khẩu là bắt buộc' });
         }
 
         const { user, accessToken ,refreshToken} = await authService.loginUser(email, password);
@@ -32,6 +33,7 @@ const login = async (req, res) => {
         });
 
         return res.status(200).json({
+            code: 1,
             message: 'Đăng nhập thành công',
             access_Token: accessToken,
             refresh_Token: refreshToken,
@@ -39,7 +41,7 @@ const login = async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(401).json({ message: error.message });
+        res.status(401).json({ code: 0, message: error.message });
     }
 };
 
@@ -47,18 +49,17 @@ const refreshAccessToken = async (req, res) => {
     try {
         const refreshToken = req.cookies.refresh_Token;
         if (!refreshToken) {
-            return res.status(400).json({ message: 'Refresh token là bắt buộc' });
+            return res.status(400).json({ code: 0, message: 'Refresh token là bắt buộc' });
         }
 
         const accessToken = await authService.getNewAccessToken(refreshToken);
         
-        return res.status(200).json({ access_Token: accessToken });
+        return res.status(200).json({ code: 1, access_Token: accessToken });
     } catch (error) {
         console.error(error);
-        return res.status(401).json({ message: error.message });
+        return res.status(401).json({ code: 0, message: error.message });
     }
 };
-
 
 module.exports = {
     create,
