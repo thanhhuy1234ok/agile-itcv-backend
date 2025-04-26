@@ -31,7 +31,7 @@ const UserSchema = new mongoose.Schema({
     address: {
         type: String,
     },
-    refreshToken: {
+    refresh_Token: {
         type: String,
     },
     dateOfBirth: {
