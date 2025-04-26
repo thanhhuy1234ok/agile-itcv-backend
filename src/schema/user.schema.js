@@ -19,9 +19,9 @@ const UserSchema = new mongoose.Schema({
         minlength: 6,
     },
     role: {
-        type: Number,
-        enum: Object.values(ROLES), 
-        default: ROLES.USER
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Roles',
+        required: true,
     },
     phone: {
         type: String,
@@ -29,6 +29,9 @@ const UserSchema = new mongoose.Schema({
         unique: true,
     },
     address: {
+        type: String,
+    },
+    refreshToken: {
         type: String,
     },
     dateOfBirth: {
