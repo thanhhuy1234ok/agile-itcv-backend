@@ -1,16 +1,16 @@
-require('dotenv').config();
+require("dotenv").config();
 
 module.exports = {
-    env: process.env.NODE_ENV || 'dev',
+  env: process.env.NODE_ENV || "dev",
 
-    port: process.env.PORT || 8080,
-    
-    dbUriDev: process.env.MONGODB_URI_DEV || '',
-    dbUriProd: process.env.MONGODB_URI_PROD || '',
+  port: process.env.PORT || 8080,
 
-    jwtAccessSecret: process.env.JWT_ACCESS_TOKEN_SECRET || '',
-    jwtAccessExpire: process.env.JWT_ACCESS_EXPIRE || '',
+  dbUriDev: process.env.MONGODB_URI_DEV || "",
+  dbUriProd: process.env.MONGODB_URI_PROD || "",
 
-    jwtRefreshSecret: process.env.JWT_REFRESH_TOKEN_SECRET || '',
-    jwtRefreshExpire: process.env.JWT_REFRESH_EXPIRE || '',
+  jwtAccessSecret: process.env.JWT_ACCESS_TOKEN_SECRET || "",
+  jwtAccessExpire: process.env.JWT_ACCESS_EXPIRE || "",
+
+  jwtRefreshSecret: process.env.JWT_REFRESH_TOKEN_SECRET || "",
+  jwtRefreshExpire: process.env.JWT_REFRESH_EXPIRE || "",
 };
