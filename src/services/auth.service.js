@@ -64,11 +64,11 @@ const loginUser = async (email, password) => {
       throw new Error("Mật khẩu không đúng");
     }
 
-    const payload = {
-      userId: user._id,
-      email: user.email,
-      role: user.role,
-    };
+        const payload = {
+            id: user._id,
+            email: user.email,
+            role: user.role,
+        };
 
     const accessToken = createAccessToken(payload);
     const refreshToken = createRefreshToken(payload);
@@ -92,16 +92,24 @@ const getNewAccessToken = async (refreshToken) => {
 
     const decoded = verifyRefreshToken(refreshToken);
 
-    return createAccessToken({
-      userId: decoded.userId,
-      email: decoded.email,
-      role: decoded.role,
-    });
-  } catch (error) {
-    console.error("Lỗi khi làm mới access token:", error.message);
-    throw new Error(error.message);
-  }
+        const accessToken = createAccessToken({
+            userId: decoded.userId,
+            email: decoded.email,
+            role: decoded.role,
+        });
+
+        const user = await User.findById(decoded.userId).select('_id name email role');
+        if (!user) {
+            throw new Error('Không tìm thấy người dùng');
+        }
+
+        return { accessToken, user };
+    } catch (error) {
+        console.error('Lỗi khi làm mới access token:', error.message);
+        throw new Error(error.message);
+    }
 };
+
 
 module.exports = {
   createUser,
