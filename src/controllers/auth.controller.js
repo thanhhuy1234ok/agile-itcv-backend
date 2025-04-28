@@ -9,7 +9,9 @@ const create = async (req, res) => {
         return res.status(201).json({
             code: 1,
             message: 'Đăng ký thành công',
-            data: newUser,
+            data:{
+                user: newUser
+            },
         });
 
     } catch (error) {
@@ -35,9 +37,16 @@ const login = async (req, res) => {
         return res.status(200).json({
             code: 1,
             message: 'Đăng nhập thành công',
-            access_Token: accessToken,
-            refresh_Token: refreshToken,
-            data: user,
+            data: {
+                access_Token: accessToken,
+                refresh_Token: refreshToken, 
+                user: {
+                    _id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role
+                }
+            },
         });
     } catch (error) {
         console.error(error);
@@ -52,14 +61,22 @@ const refreshAccessToken = async (req, res) => {
             return res.status(400).json({ code: 0, message: 'Refresh token là bắt buộc' });
         }
 
-        const accessToken = await authService.getNewAccessToken(refreshToken);
-        
-        return res.status(200).json({ code: 1, access_Token: accessToken });
+        const { accessToken, user } = await authService.getNewAccessToken(refreshToken);
+
+        return res.status(200).json({
+            code: 1,
+            message: 'Làm mới access token thành công',
+            data: {
+                access_Token: accessToken,
+                user
+            }
+        });
     } catch (error) {
         console.error(error);
         return res.status(401).json({ code: 0, message: error.message });
     }
 };
+
 
 module.exports = {
     create,
