@@ -13,9 +13,20 @@ const createRefreshToken = (payload) => {
     });
 };
 
-const verifyRefreshToken = (token) => {
-    return jwt.verify(token, jwtRefreshSecret);
+const verifyRefreshToken = async (token) => {
+    try {
+        return await jwt.verify(token, jwtRefreshSecret);
+    } catch (err) {
+        throw new Error('Refresh token không hợp lệ hoặc đã hết hạn');
+    }
 };
 
+const verifyAccessToken = async (token) => {
+    try {
+        return await jwt.verify(token, jwtAccessSecret);
+    } catch (err) {
+        throw new Error('Access token không hợp lệ hoặc đã hết hạn');
+    }
+};
 
-module.exports = { createAccessToken, createRefreshToken, verifyRefreshToken };
+module.exports = { createAccessToken, createRefreshToken, verifyRefreshToken, verifyAccessToken };

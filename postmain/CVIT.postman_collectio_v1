@@ -1,16 +1,15 @@
 {
   "info": {
     "_postman_id": "8a49ec92-6a6d-4c83-9666-06fc8b62855e",
-    "name": "CVIT",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "16896970"
+    "name": "CVIT Full API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
       "name": "AUTH",
       "item": [
         {
-          "name": "register",
+          "name": "Register",
           "request": {
             "method": "POST",
             "header": [
@@ -36,11 +35,10 @@
               "port": "8080",
               "path": ["api", "v1", "auth", "register"]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "login",
+          "name": "Login",
           "request": {
             "method": "POST",
             "header": [
@@ -66,8 +64,7 @@
               "port": "8080",
               "path": ["api", "v1", "auth", "login"]
             }
-          },
-          "response": []
+          }
         }
       ]
     },
@@ -75,19 +72,90 @@
       "name": "USER",
       "item": [
         {
-          "name": "get all user",
+          "name": "Get All Users",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <ACCESS_TOKEN>",
+                "type": "text"
+              }
+            ],
             "url": {
-              "raw": "http://localhost:8080/api/v1/users",
+              "raw": "http://localhost:8080/api/v1/users/allUsers",
               "protocol": "http",
               "host": ["localhost"],
               "port": "8080",
-              "path": ["api", "v1", "users"]
+              "path": ["api", "v1", "users", "allUsers"]
             }
-          },
-          "response": []
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer <ACCESS_TOKEN>",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Thanh Updated\",\n    \"phone\": \"0987654321\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users/updateUser?id=<USER_ID>",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "users", "updateUser"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "<USER_ID>"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get User Detail By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer <ACCESS_TOKEN>",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users/userDetail?id=<USER_ID>",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8080",
+              "path": ["api", "v1", "users", "userDetail"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "<USER_ID>"
+                }
+              ]
+            }
+          }
         }
       ]
     }
