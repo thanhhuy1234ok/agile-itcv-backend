@@ -6,27 +6,27 @@ const ResumeSchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
-    userId:{
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Users',
         required: true,
     },
-    status:{
+    status: {
         type: String,
 
     },
-    companyId:{
+    companyId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Companies',
         required: true,
     },
-    jobId:{
+    jobId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Jobs',
         required: true,
     },
-    history:[{
-        status:{
+    history: [{
+        status: {
             type: String,
             required: true,
         },
@@ -34,10 +34,15 @@ const ResumeSchema = new mongoose.Schema({
             type: Date,
             default: Date.now,
         },
-        updatedBy:{
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Users',
-            required: true,
+        updatedBy: {
+            _id: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Users',
+                required: true,
+            },
+            email: {
+                type: String,
+            },
         },
     }],
     createdAt: {
@@ -55,6 +60,42 @@ const ResumeSchema = new mongoose.Schema({
     isDeleted: {
         type: Boolean,
         default: false,
+    },
+    deletedAt: {
+        type: Date,
+        default: null,
+    },
+    createdBy: {
+        _id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+        },
+        email: {
+            type: String,
+            trim: true,
+        }
+    },
+    updatedBy: {
+        _id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+        },
+        email: {
+            type: String,
+            trim: true,
+        }
+    },
+    deletedBy: {
+        _id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            default: null,
+        },
+        email: {
+            type: String,
+            default: null,
+            trim: true,
+        }
     },
 });
 

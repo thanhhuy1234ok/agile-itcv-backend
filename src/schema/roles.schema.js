@@ -27,6 +27,42 @@ const RoleSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    deletedAt: {
+        type: Date,
+        default: null,
+    },
+    createdBy: {
+        _id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+        },
+        email: {
+            type: String,
+            trim: true,
+        }
+    },
+    updatedBy: {
+        _id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+        },
+        email: {
+            type: String,
+            trim: true,
+        }
+    },
+    deletedBy: {
+        _id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            default: null,
+        },
+        email: {
+            type: String,
+            default: null,
+            trim: true,
+        }
+    },
 });
 
 module.exports = mongoose.model('Roles', RoleSchema);

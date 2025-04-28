@@ -19,9 +19,14 @@ const UserSchema = new mongoose.Schema({
         minlength: 6,
     },
     role: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Roles',
-        required: true,
+        _id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Roles',
+            required: true,
+        },
+        name: {
+            type: String,
+        }
     },
     phone: {
         type: String,
@@ -48,6 +53,42 @@ const UserSchema = new mongoose.Schema({
     isDeleted: {
         type: Boolean,
         default: false,
+    },
+    deletedAt: {
+        type: Date,
+        default: null,
+    },
+    createdBy: {
+        _id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+        },
+        email: {
+            type: String,
+            trim: true,
+        }
+    },
+    updatedBy: {
+        _id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+        },
+        email: {
+            type: String,
+            trim: true,
+        }
+    },
+    deletedBy: {
+        _id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            default: null,
+        },
+        email: {
+            type: String,
+            default: null,
+            trim: true,
+        }
     },
 });
 

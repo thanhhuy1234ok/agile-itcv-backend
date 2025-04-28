@@ -1,11 +1,17 @@
 const express = require('express');
 const {port} =require('./configs/env.config.js');
-const mainRouter =  require('./routers/index.js');
+const mainRouter =  require('./routers/router.js');
 require('./configs/db.config.js');
 const app = express();
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const nodemailer = require('nodemailer');
+const hbs = require('hbs');
+const fs = require('fs');
+const path = require('path');
 
+app.set('view engine', 'hbs');
+app.set('templates', path.join(__dirname, 'templates'));
 
 app.use(cors({
     origin: 'http://localhost:3000', // Chỉ cho phép từ FE ở port 3000
