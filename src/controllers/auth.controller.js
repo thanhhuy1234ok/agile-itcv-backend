@@ -2,28 +2,28 @@ const ms = require('ms');
 const authService = require('../services/auth.service');
 const { jwtRefreshExpire } = require('../configs/env.config');
 const { sendSuccess, sendError } = require('../utils/response');
+const StatusCodes = require('../constants/statusCodes');
 
 const create = async (req, res) => {
     try {
         const newUser = await authService.createUser(req.body);
-
-        return sendSuccess(res, 'Đăng ký thành công', {
-            user: newUser,
-        });
+        
+        return sendSuccess(res, 'Đăng ký thành công', { user: newUser }, StatusCodes.CREATED);
     } catch (error) {
-        console.error(error);
-        return sendError(res, 500, error.message);
+        console.error('Create User Error:', error.message);
+        return sendError(res, StatusCodes.INTERNAL_SERVER_ERROR, error.message);
     }
 };
 
 const login = async (req, res) => {
     try {
-
         const { user, accessToken, refreshToken } = await authService.loginUser(req.body);
 
         res.cookie('refresh_Token', refreshToken, {
             httpOnly: true,
             maxAge: ms(jwtRefreshExpire),
+            sameSite: 'strict',
+            secure: process.env.NODE_ENV === 'production',
         });
 
         return sendSuccess(res, 'Đăng nhập thành công', {
@@ -35,10 +35,10 @@ const login = async (req, res) => {
                 email: user.email,
                 role: user.role,
             },
-        });
+        }, StatusCodes.OK);
     } catch (error) {
-        console.error(error);
-        return sendError(res, 401, error.message);
+        console.error('Login Error:', error.message);
+        return sendError(res, StatusCodes.UNAUTHORIZED, error.message);
     }
 };
 
@@ -46,7 +46,7 @@ const refreshAccessToken = async (req, res) => {
     try {
         const refreshToken = req.cookies.refresh_Token;
         if (!refreshToken) {
-            return sendError(res, 400, 'Refresh token là bắt buộc');
+            return sendError(res, StatusCodes.BAD_REQUEST, 'Refresh token là bắt buộc');
         }
 
         const { accessToken, user } = await authService.getNewAccessToken(refreshToken);
@@ -54,10 +54,10 @@ const refreshAccessToken = async (req, res) => {
         return sendSuccess(res, 'Làm mới access token thành công', {
             access_Token: accessToken,
             user,
-        });
+        }, StatusCodes.OK);
     } catch (error) {
-        console.error(error);
-        return sendError(res, 401, error.message);
+        console.error('Refresh Access Token Error:', error.message);
+        return sendError(res, StatusCodes.UNAUTHORIZED, error.message);
     }
 };
 
