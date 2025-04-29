@@ -1,6 +1,7 @@
 const encode_bcrypt = require('../utils/bcrypt.password.js');
 const User = require('../schema/user.schema.js');
 const UserFactory = require('../factories/UserFactory.js');
+const createJwtPayload = require('../utils/jwtPayload.js')
 const { createAccessToken, createRefreshToken, verifyRefreshToken } = require('../utils/jwt.js')
 
 const createUser = async (userData) => {
@@ -61,11 +62,7 @@ const loginUser = async (userData) => {
             throw new Error('Mật khẩu không đúng');
         }
 
-        const payload = {
-            _id: user._id,
-            email: user.email,
-            role: user.role,
-        };
+        const payload = createJwtPayload(user);
 
         const accessToken = createAccessToken(payload);
         const refreshToken = createRefreshToken(payload);
@@ -89,16 +86,13 @@ const getNewAccessToken = async (refreshToken) => {
 
         const decoded = await verifyRefreshToken(refreshToken);
 
-        const accessToken = createAccessToken({
-            _id: decoded._id,
-            email: decoded.email,
-            role: decoded.role,
-        });
-
         const user = await User.findById(decoded._id).select('_id name email role');
         if (!user) {
             throw new Error('Không tìm thấy người dùng');
         }
+
+        const payload = createJwtPayload(user);
+        const accessToken = createAccessToken(payload);
 
         return { accessToken, user };
     } catch (error) {
