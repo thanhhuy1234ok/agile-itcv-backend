@@ -62,7 +62,7 @@ const loginUser = async (userData) => {
         }
 
         const payload = {
-            id: user._id,
+            _id: user._id,
             email: user.email,
             role: user.role,
         };
@@ -87,15 +87,15 @@ const getNewAccessToken = async (refreshToken) => {
             throw new Error('Refresh token là bắt buộc');
         }
 
-        const decoded = verifyRefreshToken(refreshToken);
+        const decoded = await verifyRefreshToken(refreshToken);
 
         const accessToken = createAccessToken({
-            userId: decoded.userId,
+            _id: decoded._id,
             email: decoded.email,
             role: decoded.role,
         });
 
-        const user = await User.findById(decoded.userId).select('_id name email role');
+        const user = await User.findById(decoded._id).select('_id name email role');
         if (!user) {
             throw new Error('Không tìm thấy người dùng');
         }
