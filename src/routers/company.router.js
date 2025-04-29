@@ -5,7 +5,6 @@ const companyRouter = express.Router();
 
 companyRouter.use(authMiddleware);
 
-// Route để tạo công ty mới
 companyRouter.post('/',companyController.createCompany);
 companyRouter.get('/', companyController.getAllCompanies);
 

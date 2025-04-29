@@ -1,25 +1,27 @@
-const { verifyRefreshToken } = require('../utils/jwt');
+const { verifyAccessToken } = require('../utils/jwt');
+const { sendError } = require('../utils/response'); 
+const StatusCodes = require('../constants/statusCodes');
 
 const authMiddleware = async (req, res, next) => {
     try {
-        const token = req.headers['authorization']?.split(' ')[1];
-        console.log(token);
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
+
         if (!token) {
-            return res.status(401).json({ message: 'Không có access token' });
+            return sendError(res, StatusCodes.UNAUTHORIZED, 'Không có access token');
         }
 
-        const userData = await verifyRefreshToken(token); // verify token
-        console.log(userData);
+        const userData = await verifyAccessToken(token);
+
         if (!userData) {
-            return res.status(401).json({ message: 'Access token không hợp lệ' });
+            return sendError(res, StatusCodes.UNAUTHORIZED, 'Access token không hợp lệ');
         }
 
-        req.user = userData
-
+        req.user = userData;
         next();
     } catch (error) {
         console.error('AuthMiddleware Error:', error.message);
-        return res.status(401).json({ message: 'Access token không hợp lệ' });
+        return sendError(res, StatusCodes.UNAUTHORIZED, 'Access token không hợp lệ');
     }
 };
 

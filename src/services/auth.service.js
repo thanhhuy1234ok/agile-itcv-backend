@@ -42,8 +42,13 @@ const createUser = async (userData) => {
     }
 };
 
-const loginUser = async (email, password) => {
+const loginUser = async (userData) => {
     try {
+        const { email, password } = userData;
+        if (!email || !password) {
+            throw new Error('Email, password là bắt buộc');
+        }
+
         const user = await User.findOne({ email, isDeleted: false });
 
         if (!user) {
