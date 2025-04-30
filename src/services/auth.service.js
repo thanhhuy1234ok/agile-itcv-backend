@@ -1,6 +1,7 @@
 const encode_bcrypt = require("../utils/bcrypt.password.js");
 const User = require("../schema/user.schema.js");
 const UserFactory = require("../factories/UserFactory.js");
+const createJwtPayload = require("../utils/jwtPayload.js");
 const {
   createAccessToken,
   createRefreshToken,
@@ -47,8 +48,13 @@ const createUser = async (userData) => {
   }
 };
 
-const loginUser = async (email, password) => {
+const loginUser = async (userData) => {
   try {
+    const { email, password } = userData;
+    if (!email || !password) {
+      throw new Error("Email, password là bắt buộc");
+    }
+
     const user = await User.findOne({ email, isDeleted: false });
 
     if (!user) {
@@ -64,11 +70,7 @@ const loginUser = async (email, password) => {
       throw new Error("Mật khẩu không đúng");
     }
 
-        const payload = {
-            id: user._id,
-            email: user.email,
-            role: user.role,
-        };
+    const payload = createJwtPayload(user);
 
     const accessToken = createAccessToken(payload);
     const refreshToken = createRefreshToken(payload);
@@ -90,26 +92,22 @@ const getNewAccessToken = async (refreshToken) => {
       throw new Error("Refresh token là bắt buộc");
     }
 
-    const decoded = verifyRefreshToken(refreshToken);
+    const decoded = await verifyRefreshToken(refreshToken);
 
-        const accessToken = createAccessToken({
-            userId: decoded.userId,
-            email: decoded.email,
-            role: decoded.role,
-        });
-
-        const user = await User.findById(decoded.userId).select('_id name email role');
-        if (!user) {
-            throw new Error('Không tìm thấy người dùng');
-        }
-
-        return { accessToken, user };
-    } catch (error) {
-        console.error('Lỗi khi làm mới access token:', error.message);
-        throw new Error(error.message);
+    const user = await User.findById(decoded._id).select("_id name email role");
+    if (!user) {
+      throw new Error("Không tìm thấy người dùng");
     }
-};
 
+    const payload = createJwtPayload(user);
+    const accessToken = createAccessToken(payload);
+
+    return { accessToken, user };
+  } catch (error) {
+    console.error("Lỗi khi làm mới access token:", error.message);
+    throw new Error(error.message);
+  }
+};
 
 module.exports = {
   createUser,
