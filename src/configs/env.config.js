@@ -13,4 +13,10 @@ module.exports = {
 
     jwtRefreshSecret: process.env.JWT_REFRESH_TOKEN_SECRET || '',
     jwtRefreshExpire: process.env.JWT_REFRESH_EXPIRE || '',
+
+    cloudinary: {
+        cloudName: process.env.CLOUD_NAME || '',
+        apiKey: process.env.CLOUD_API_KEY || '',
+        apiSecret: process.env.CLOUD_API_SECRET || ''
+    }
 };
