@@ -6,25 +6,27 @@ const JobSchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
-    skill: {
-        type: String,
-        required: true,
-        trim: true,
-    },
+    skill: [
+        {
+            type: String,
+            trim: true,
+        }
+    ],
     description: {
         type: String,
         required: true,
         trim: true,
     },
     companyId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Companies',
-        required: true,
-    },
-    location: {
-        type: String,
-        required: true,
-        trim: true,
+        _id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Company',
+            required: true,
+        },
+        name: {
+            type: String,
+            trim: true,
+        }
     },
     salary: {
         type: Number,

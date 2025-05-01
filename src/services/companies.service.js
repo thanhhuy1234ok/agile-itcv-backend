@@ -1,4 +1,5 @@
 const Company = require('../schema/companies.schema.js');
+const { paginate, softDeleteDocument } = require('../utils/queryMongoose.js');
 
 const createCompany = async (companyData, user) => {
     try {
@@ -13,7 +14,7 @@ const createCompany = async (companyData, user) => {
             description,
             address,
             createdBy:{
-                _id: user.id,
+                _id: user._id,
                 email: user.email,
             }
         });
@@ -27,18 +28,80 @@ const createCompany = async (companyData, user) => {
     }
 }
 
-const getAllCompanies = async () => {
+const getAllCompanies = async (queryParams) => {
     try {
-        const company = await Company.find({ isDeleted: false })
-            .sort({ createdAt: -1 });
-        return company;
+        const companies = await paginate(Company, queryParams);
+        return companies;
     } catch (error) {
         console.error('Lỗi khi lấy danh sách công ty:', error.message);
         throw new Error(error.message);
     }
 }
 
+const getCompanyById = async (id) => {
+    try {
+        const company = await Company.findById(id).where({ isDeleted: false });
+        if (!company) {
+            throw new Error('Không tìm thấy công ty');
+        }
+        return company;
+    } catch (error) {
+        console.error('Lỗi khi lấy công ty theo ID:', error.message);
+        throw new Error(error.message);
+    }
+}
+
+const updateCompany = async (id, data, user) => {
+    try {
+        if (!id) {
+            throw new Error('ID công ty là bắt buộc');
+        }
+
+        const company = await Company.findById(id).where({ isDeleted: false });
+        if (!company) {
+            throw new Error('Không tìm thấy công ty');
+        }
+
+        // Cập nhật từng trường nếu có truyền vào
+        if (data.name) company.name = data.name;
+        if (data.description) company.description = data.description;
+        if (data.address) company.address = data.address;
+
+        company.updatedBy = {
+            _id: user._id,
+            email: user.email,
+        };
+        company.updatedAt = new Date();
+
+        const updatedCompany = await company.save();
+        return updatedCompany;
+    } catch (error) {
+        console.error('Lỗi khi cập nhật công ty:', error.message);
+        throw new Error(error.message);
+    }
+};
+
+const deleteCompany = async (id, user) => {
+    try {
+        const company = await Company.findById(id).where({ isDeleted: false });
+        if (!company) {
+            throw new Error('Không tìm thấy công ty');
+        }
+
+        const deletedCompany = await softDeleteDocument(Company,id ,user);
+
+        return deletedCompany;
+    } catch (error) {
+        console.error('Lỗi khi xóa công ty:', error.message);
+        throw new Error(error.message);
+    }
+}
+
+
 module.exports = {
     createCompany,
     getAllCompanies,
+    getCompanyById,
+    updateCompany,
+    deleteCompany,
 };
