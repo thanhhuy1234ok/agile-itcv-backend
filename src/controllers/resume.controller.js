@@ -1,6 +1,27 @@
 const { sendSuccess, sendError } = require('../utils/response.js');
 const StatusCodes = require('../constants/statusCodes');
 const resumeService = require('../services/resume.service.js');
+// const path = require('path');
+
+// const uploadFile = async (req, res) => {
+//     try {
+//         const resumeData = req.body;
+//         const user = req.user;
+//         const file = req.file;
+
+//         if (!file) {
+//             return sendError(res, StatusCodes.BAD_REQUEST, 'No file uploaded');
+//         }
+
+//         const cvPath = path.join('uploads', `company_${resumeData.companyId}`, file.filename);
+
+//         const newResume = await resumeService.createResume(resumeData, user, cvPath);
+
+//         return sendSuccess(res, 'File uploaded and resume created successfully', newResume, StatusCodes.CREATED);
+//     } catch (error) {
+//         return sendError(res, StatusCodes.INTERNAL_SERVER_ERROR, error.message);
+//     }
+// };
 
 const createResume = async (req, res) => {
     try {
@@ -68,6 +89,7 @@ const getResumeByUserId = async (req, res) => {
 }
 
 module.exports = {
+    // uploadFile,
     createResume,
     getAllResumes,
     getResumeById,

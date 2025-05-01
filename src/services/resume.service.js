@@ -2,22 +2,56 @@ const { paginate, softDeleteDocument } = require('../utils/queryMongoose.js');
 const Resume = require('../schema/resume.schema.js');
 const StatusResume = require('../constants/status.resume.js');
 
-const createResume = async (resumeData, user) => {
+// const createResume = async (resumeData, user, cvPath) => {
+//     try {
+//         const { companyId, jobId } = resumeData;
+//         const newResumer = new Resume({
+//             companyId,
+//             jobId,
+//             userId: user._id,
+//             email: user.email,
+//             status: StatusResume.PENDING,
+//             createdBy: {
+//                 _id: user._id,
+//                 email: user.email
+//             },
+//             history: [
+//                 {
+//                     status: StatusResume.PENDING,
+//                     updatedBy: {
+//                         _id: user._id,
+//                         email: user.email
+//                     }
+//                 }
+//             ]
+//         });
+//         const resume = await newResumer.save();
+//         return resume;
+
+//     } catch (error) {
+//         console.error('Error creating resume:', error);
+//         throw new Error('Error creating resume: ' + error.message);
+//     }
+// }
+
+const createResume = async (resumeData, user, cvPath) => {
     try {
         const { companyId, jobId } = resumeData;
-        const newResumer = new Resume({
+
+        const newResume = new Resume({
             companyId,
             jobId,
             userId: user._id,
             email: user.email,
-            status: StatusResume.PENDING,
+            cvPath: cvPath, 
+            status: StatusResume.PENDING, 
             createdBy: {
                 _id: user._id,
                 email: user.email
             },
             history: [
                 {
-                    status: StatusResume.PENDING,
+                    status: StatusResume.PENDING, 
                     updatedBy: {
                         _id: user._id,
                         email: user.email
@@ -25,14 +59,16 @@ const createResume = async (resumeData, user) => {
                 }
             ]
         });
-        const resume = await newResumer.save();
+
+        const resume = await newResume.save();
+
         return resume;
 
     } catch (error) {
         console.error('Error creating resume:', error);
         throw new Error('Error creating resume: ' + error.message);
     }
-}
+};
 
 const getAllResumes = async (queryParams) => {
     try {
