@@ -8,5 +8,7 @@ roleRouter.use(authMiddleware);
 roleRouter.post('/', roleController.createRole);
 roleRouter.get('/', roleController.getAllRoles);
 roleRouter.get('/:id', roleController.getRoleById);
+roleRouter.put('/:id', roleController.updateRole);
+roleRouter.delete('/:id', roleController.deleteRole);
 
 module.exports = roleRouter;
