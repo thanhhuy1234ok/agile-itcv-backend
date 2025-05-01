@@ -4,9 +4,9 @@ const Company = require('../schema/companies.schema.js');
 
 const createJob = async(jobData, user) => {
     try {
-        const { name, description, companyId, skill, salary, quantity, level, startDate, endDate } = jobData
-        if (!name || !description || !companyId || !salary || !quantity || !level || !startDate || !endDate) {
-            throw new Error('name, description, companyId, salary, quantity, level, startDate và endDate là bắt buộc');
+        const { name, description, companyId, skill, salary, quantity, level, startDate, endDate, location } = jobData
+        if (!name || !description || !companyId || !salary || !quantity || !level || !startDate || !endDate || !location) {
+            throw new Error('name, description, companyId, salary, quantity, level, location ,startDate và endDate là bắt buộc');
         }
 
         const company = await Company.findById(companyId).where({ isDeleted: false });
@@ -23,6 +23,7 @@ const createJob = async(jobData, user) => {
                 name: company.name,
             },
             skill,
+            location,
             salary,
             quantity,
             level,
@@ -81,7 +82,7 @@ const updateJob = async (id, data, user) => {
         if (data.skill) job.skill = data.skill;
         if (data.startDate) job.startDate = new Date(data.startDate);
         if (data.endDate) job.endDate = new Date(data.endDate);
-        if (data.isActive !== undefined) job.isActive = data.isActive;
+        if (data.location) job.location = data.location;
 
         if (data.companyId && data.companyName) {
             job.companyId = {
