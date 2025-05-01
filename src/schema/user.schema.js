@@ -38,6 +38,7 @@ const UserSchema = new mongoose.Schema({
     },
     refresh_Token: {
         type: String,
+        default: null,
     },
     dateOfBirth: {
         type: String,

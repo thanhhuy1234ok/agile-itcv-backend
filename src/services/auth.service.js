@@ -1,6 +1,8 @@
 const encode_bcrypt = require('../utils/bcrypt.password.js');
 const User = require('../schema/user.schema.js');
+const Role = require('../schema/roles.schema.js');
 const UserFactory = require('../factories/UserFactory.js');
+const { NORMAL_USER } = require('../constants/role.js');
 const createJwtPayload = require('../utils/jwtPayload.js')
 const { createAccessToken, createRefreshToken, verifyRefreshToken } = require('../utils/jwt.js')
 
@@ -22,6 +24,12 @@ const createUser = async (userData) => {
             throw new Error('Số điện thoại đã tồn tại');
         }
 
+        const findRole = await Role.findOne({ name: NORMAL_USER });
+
+        if (!findRole) {
+            throw new Error('Không tìm thấy vai trò người dùng');
+        }
+
         const hashedPassword = await encode_bcrypt.hashPassword(password);
 
         const newUser = UserFactory.create({
@@ -29,9 +37,12 @@ const createUser = async (userData) => {
             email,
             password: hashedPassword,
             phone,
+            role:{
+                _id: findRole._id,
+                name: findRole.name,
+            },
             address,
             dateOfBirth,
-            role,
         });
 
         const savedUser = await newUser.save();
@@ -67,6 +78,11 @@ const loginUser = async (userData) => {
         const accessToken = createAccessToken(payload);
         const refreshToken = createRefreshToken(payload);
 
+        await User.updateOne(
+            { _id: user._id },
+            { $set: { refresh_Token: refreshToken } }
+        );
+
         return {
             accessToken,
             refreshToken,
@@ -101,9 +117,22 @@ const getNewAccessToken = async (refreshToken) => {
     }
 };
 
+const logoutUser = async (refreshToken,user) => {
+    try {
+        console.log('refreshToken', refreshToken);
+        console.log(user._id);
+        return await User.findOneAndUpdate({ _id: user._id }, { refresh_Token: refreshToken }, { new: true });
+    } catch (error) {
+        console.error('Lỗi khi đăng xuất:', error.message);
+        throw new Error(error.message);
+    }
+}
+
+
 
 module.exports = {
     createUser,
     loginUser,
-    getNewAccessToken
+    getNewAccessToken,
+    logoutUser,
 };

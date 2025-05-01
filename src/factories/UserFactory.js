@@ -3,13 +3,14 @@ const ROLES = require('../constants/role');
 
 class UserFactory {
     static create({ name, email, password, role, phone, address, dateOfBirth }) {
-        const roleValue = Object.values(ROLES).includes(role) ? role : ROLES.USER;
-
         return new User({
             name,
             email,
             password,
-            role: roleValue,
+            role: {
+                _id: role._id,
+                name: role.name,
+            },
             phone,
             address,
             dateOfBirth

@@ -61,8 +61,33 @@ const refreshAccessToken = async (req, res) => {
     }
 };
 
+const logout = async (req, res) => {
+    try {
+        const refreshToken = req.cookies.refresh_Token;
+        if (!refreshToken) {
+            return sendError(res, StatusCodes.BAD_REQUEST, 'Refresh token là bắt buộc');
+        }
+
+        const user = req.user;
+
+        await authService.logoutUser("", user);
+
+        res.clearCookie('refresh_Token', {
+            httpOnly: true,
+            sameSite: 'strict',
+            secure: process.env.NODE_ENV === 'production',
+        });
+
+        return sendSuccess(res, 'Đăng xuất thành công', {}, StatusCodes.OK);
+    } catch (error) {
+        console.error('Logout Error:', error.message);
+        return sendError(res, StatusCodes.INTERNAL_SERVER_ERROR, error.message);
+    }
+};
+
 module.exports = {
     create,
     login,
     refreshAccessToken,
+    logout
 };
