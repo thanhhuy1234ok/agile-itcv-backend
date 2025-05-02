@@ -36,6 +36,10 @@ const UserSchema = new mongoose.Schema({
     address: {
         type: String,
     },
+    img_url: {
+        type: String,
+        default: null,
+    },
     refresh_Token: {
         type: String,
         default: null,
