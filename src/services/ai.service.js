@@ -8,7 +8,14 @@ const knownSkills = [
     'typescript', 'javascript', 'python', 'html', 'css'
 ];
 
-const knownLanguages = ['english', 'japanese', 'korean', 'french', 'german', 'chinese'];
+const knownLanguages = {
+    english: ['english', 'tiếng anh'],
+    japanese: ['japanese', 'tiếng nhật'],
+    korean: ['korean', 'tiếng hàn'],
+    french: ['french', 'tiếng pháp'],
+    german: ['german', 'tiếng đức'],
+    chinese: ['chinese', 'tiếng trung']
+};
 
 const extractSkills = (text) => {
     const lower = text.toLowerCase();
@@ -17,7 +24,15 @@ const extractSkills = (text) => {
 
 const extractLanguages = (text) => {
     const lower = text.toLowerCase();
-    return knownLanguages.filter(lang => lower.includes(lang));
+    const found = [];
+
+    for (const [standardLang, aliases] of Object.entries(knownLanguages)) {
+        if (aliases.some(alias => lower.includes(alias))) {
+            found.push(standardLang);
+        }
+    }
+
+    return found;
 };
 
 async function analyzeCV(cvPath, jobId) {
@@ -58,6 +73,7 @@ async function analyzeCV(cvPath, jobId) {
         }
     };
 }
+
 module.exports = {
     analyzeCV
 };
