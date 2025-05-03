@@ -50,6 +50,22 @@ const ResumeSchema = new mongoose.Schema({
             },
         },
     }],
+
+    score: {
+        type: Number,
+        min: 0,
+        max: 10,
+        default: 0,
+    },
+    matchedSkills: {
+        type: [String],
+        default: [],
+    },
+    analysis: {
+        type: Object,
+        default: {}, // ví dụ: { skillMatchPercent: 80, experienceMatch: true }
+    },
+    
     createdAt: {
         type: Date,
         default: Date.now,

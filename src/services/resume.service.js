@@ -1,6 +1,8 @@
 const { paginate, softDeleteDocument } = require('../utils/queryMongoose.js');
 const Resume = require('../schema/resume.schema.js');
 const StatusResume = require('../constants/status.resume.js');
+const { analyzeCV } = require('../services/ai.service');
+const path = require('path');
 
 // const createResume = async (resumeData, user, cvPath) => {
 //     try {
@@ -34,17 +36,22 @@ const StatusResume = require('../constants/status.resume.js');
 //     }
 // }
 
-const createResume = async (resumeData, user, cvPath) => {
+const createResume = async (resumeData, user) => {
     try {
-        const { companyId, jobId } = resumeData;
+        const { companyId, jobId ,url} = resumeData;
+
+        const analysisResult = await analyzeCV(url,jobId);
 
         const newResume = new Resume({
             companyId,
             jobId,
             userId: user._id,
             email: user.email,
-            cvPath: cvPath, 
+            cvPath: url, 
             status: StatusResume.PENDING, 
+            score: analysisResult.score,
+            matchedSkills: analysisResult.matchedSkills,
+            analysis: analysisResult.analysis,
             createdBy: {
                 _id: user._id,
                 email: user.email
