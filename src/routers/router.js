@@ -6,6 +6,7 @@ const roleRoutes = require('./role.router.js');
 const jobRoutes = require('./job.router.js');
 const resumeRoutes = require('./resume.router.js');
 const fileRouter = require('./files.router.js');
+const mailerRouter = require('./mailer.router.js');
 const router = express.Router();
 
 router.use('/users', userRoutes);
@@ -15,6 +16,7 @@ router.use('/roles', roleRoutes);
 router.use('/jobs', jobRoutes);
 router.use('/resumes', resumeRoutes);
 router.use('/files', fileRouter);
+router.use('/mailer', mailerRouter);
 
 module.exports =  router;
  

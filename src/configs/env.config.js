@@ -18,5 +18,11 @@ module.exports = {
         cloudName: process.env.CLOUD_NAME || '',
         apiKey: process.env.CLOUD_API_KEY || '',
         apiSecret: process.env.CLOUD_API_SECRET || ''
+    },
+
+    mailer:{
+        service: process.env.EMAIL_AUTH_HOST || 'gmail',
+        user: process.env.EMAIL_AUTH_USER || '',
+        pass: process.env.EMAIL_AUTH_PASSWORD || ''
     }
 };
