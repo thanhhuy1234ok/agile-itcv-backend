@@ -1,4 +1,3 @@
 module.exports = {
-  ADMIN: "0",
-  USER: "1",
-};
+    NORMAL_USER: "NORMAL USER",
+}

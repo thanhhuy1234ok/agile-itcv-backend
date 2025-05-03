@@ -7,5 +7,8 @@ companyRouter.use(authMiddleware);
 
 companyRouter.post('/',companyController.createCompany);
 companyRouter.get('/', companyController.getAllCompanies);
+companyRouter.get('/:id', companyController.getCompanyById);
+companyRouter.put('/:id', companyController.updateCompany);
+companyRouter.delete('/:id', companyController.deleteCompany);
 
 module.exports = companyRouter;

@@ -4,7 +4,12 @@ const ResumeSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        trim: true,
+        trim: true, 
+    },
+    cvPath: {
+        type: String,
+        required: true, 
+        trim: true, 
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -13,7 +18,6 @@ const ResumeSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-
     },
     companyId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -42,9 +46,26 @@ const ResumeSchema = new mongoose.Schema({
             },
             email: {
                 type: String,
+                trim: true, 
             },
         },
     }],
+
+    score: {
+        type: Number,
+        min: 0,
+        max: 10,
+        default: 0,
+    },
+    matchedSkills: {
+        type: [String],
+        default: [],
+    },
+    analysis: {
+        type: Object,
+        default: {}, // ví dụ: { skillMatchPercent: 80, experienceMatch: true }
+    },
+    
     createdAt: {
         type: Date,
         default: Date.now,
@@ -61,10 +82,6 @@ const ResumeSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    deletedAt: {
-        type: Date,
-        default: null,
-    },
     createdBy: {
         _id: {
             type: mongoose.Schema.Types.ObjectId,
@@ -72,8 +89,8 @@ const ResumeSchema = new mongoose.Schema({
         },
         email: {
             type: String,
-            trim: true,
-        }
+            trim: true, 
+        },
     },
     updatedBy: {
         _id: {
@@ -82,8 +99,8 @@ const ResumeSchema = new mongoose.Schema({
         },
         email: {
             type: String,
-            trim: true,
-        }
+            trim: true, 
+        },
     },
     deletedBy: {
         _id: {
@@ -94,8 +111,8 @@ const ResumeSchema = new mongoose.Schema({
         email: {
             type: String,
             default: null,
-            trim: true,
-        }
+            trim: true, 
+        },
     },
 });
 

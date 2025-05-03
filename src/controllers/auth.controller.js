@@ -55,37 +55,51 @@ const login = async (req, res) => {
 };
 
 const refreshAccessToken = async (req, res) => {
-  try {
-    const refreshToken = req.cookies.refresh_Token;
-    if (!refreshToken) {
-      return sendError(
-        res,
-        StatusCodes.BAD_REQUEST,
-        "Refresh token là bắt buộc"
-      );
+    try {
+        const refreshToken = req.cookies.refresh_Token;
+        if (!refreshToken) {
+            return sendError(res, StatusCodes.BAD_REQUEST, 'Refresh token là bắt buộc');
+        }
+
+        const { accessToken, user } = await authService.getNewAccessToken(refreshToken);
+
+        return sendSuccess(res, 'Làm mới access token thành công', {
+            access_Token: accessToken,
+            user,
+        }, StatusCodes.OK);
+    } catch (error) {
+        console.error('Refresh Access Token Error:', error.message);
+        return sendError(res, StatusCodes.UNAUTHORIZED, error.message);
     }
+};
 
-    const { accessToken, user } = await authService.getNewAccessToken(
-      refreshToken
-    );
+const logout = async (req, res) => {
+    try {
+        const refreshToken = req.cookies.refresh_Token;
+        if (!refreshToken) {
+            return sendError(res, StatusCodes.BAD_REQUEST, 'Refresh token là bắt buộc');
+        }
 
-    return sendSuccess(
-      res,
-      "Làm mới access token thành công",
-      {
-        access_Token: accessToken,
-        user,
-      },
-      StatusCodes.OK
-    );
-  } catch (error) {
-    console.error("Refresh Access Token Error:", error.message);
-    return sendError(res, StatusCodes.UNAUTHORIZED, error.message);
-  }
+        const user = req.user;
+
+        await authService.logoutUser("", user);
+
+        res.clearCookie('refresh_Token', {
+            httpOnly: true,
+            sameSite: 'strict',
+            secure: process.env.NODE_ENV === 'production',
+        });
+
+        return sendSuccess(res, 'Đăng xuất thành công', {}, StatusCodes.OK);
+    } catch (error) {
+        console.error('Logout Error:', error.message);
+        return sendError(res, StatusCodes.INTERNAL_SERVER_ERROR, error.message);
+    }
 };
 
 module.exports = {
-  create,
-  login,
-  refreshAccessToken,
+    create,
+    login,
+    refreshAccessToken,
+    logout
 };

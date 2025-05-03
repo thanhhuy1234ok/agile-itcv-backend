@@ -1,55 +1,61 @@
 const mongoose = require("mongoose");
 
 const JobSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  skill: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  description: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  companyId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Companies",
-    required: true,
-  },
-  location: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  salary: {
-    type: Number,
-    required: true,
-  },
-  quantity: {
-    type: Number,
-    required: true,
-  },
-  level: {
-    type: String,
-    required: true,
-  },
-  startDate: {
-    type: Date,
-    required: true,
-  },
-  endDate: {
-    type: Date,
-    required: true,
-  },
-  isActive: {
-    type: Boolean,
-    default: true,
-  },
+    name: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    skill: [
+        {
+            type: String,
+            trim: true,
+        }
+    ],
+    description: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    companyId: {
+        _id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Company',
+            required: true,
+        },
+        name: {
+            type: String,
+            trim: true,
+        }
+    },
+    location:{
+        type: String,
+        trim: true,
+    },
+    salary: {
+        type: Number,
+        required: true,
+    },
+    quantity: {
+        type: Number,
+        required: true,
+    },
+    level: {
+        type: String,
+        required: true,
+    },
+    startDate: {
+        type: Date,
+        required: true,
+    },
+    endDate: {
+        type: Date,
+        required: true,
+    },
+    isActive: {
+        type: Boolean,
+        default: true,
+    },
 
   createdAt: {
     type: Date,

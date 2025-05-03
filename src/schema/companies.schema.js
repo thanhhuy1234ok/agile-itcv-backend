@@ -11,6 +11,9 @@ const CompanySchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
+    logo: {
+        type: String,
+    },
     description: {
         type: String,
         required: true,

@@ -5,9 +5,6 @@ require('./configs/db.config.js');
 const app = express();
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-const nodemailer = require('nodemailer');
-const hbs = require('hbs');
-const fs = require('fs');
 const path = require('path');
 
 app.set('view engine', 'hbs');
