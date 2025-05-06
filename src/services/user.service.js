@@ -85,15 +85,18 @@ const getUserById = async (userId) => {
 
 const updateUser = async (userId, updateData, currentUser = null) => {
     try {
-        if (!userId) {
-            throw new Error('userId là bắt buộc');
+        if (!userId) throw new Error('Thiếu userId');
+
+        if (updateData.role && typeof updateData.role === 'string') {
+            const role = await Role.findById(updateData.role);
+            if (!role) throw new Error('Không tìm thấy vai trò');
+
+            updateData.role = {
+                _id: role._id,
+                name: role.name,
+            };
         }
 
-        const disallowedFields = ['password', 'refresh_Token'];
-        disallowedFields.forEach(field => delete updateData[field]);
-
-
-        // Optional: Lưu người sửa nếu có
         if (currentUser) {
             updateData.updatedBy = {
                 _id: currentUser._id,
@@ -109,17 +112,14 @@ const updateUser = async (userId, updateData, currentUser = null) => {
             { new: true }
         );
 
-        if (!updatedUser) {
-            throw new Error('User not found');
-        }
+        if (!updatedUser) throw new Error('Không tìm thấy user');
 
         return updatedUser;
     } catch (error) {
-        console.error('Error updating user:', error.message);
+        console.error(error);
         throw new Error(error.message);
     }
 };
-
 
 const deleteUser = async (userId, currentUser) => {
     try {
