@@ -38,7 +38,7 @@ const UserSchema = new mongoose.Schema({
     },
     img_url: {
         type: String,
-        default: null,
+        default: 'https://res.cloudinary.com/ddhjlaqjn/image/upload/v1746519989/images/itviec.jpg',
     },
     refresh_Token: {
         type: String,
