@@ -3,7 +3,7 @@ const { paginate, softDeleteDocument } = require('../utils/queryMongoose.js');
 
 const createCompany = async (companyData, user) => {
     try {
-        const { name,description , address } = companyData;
+        const { name, description, address, logo } = companyData;
 
         if (!name || !description || !address) {
             throw new Error('Name, description và address là bắt buộc');
@@ -13,7 +13,8 @@ const createCompany = async (companyData, user) => {
             name,
             description,
             address,
-            createdBy:{
+            logo: logo || null, 
+            createdBy: {
                 _id: user._id,
                 email: user.email,
             }
@@ -27,6 +28,8 @@ const createCompany = async (companyData, user) => {
         throw new Error(error.message);
     }
 }
+
+
 
 const getAllCompanies = async (queryParams) => {
     try {
