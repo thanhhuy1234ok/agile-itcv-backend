@@ -61,7 +61,7 @@ const updateUser = async (req, res) => {
             return sendError(res, StatusCodes.BAD_REQUEST, 'No update data provided');
         }
 
-        const updatedUser = await userService.updateUser(userId, updateData,user);
+        const updatedUser = await userService.updateUser(userId, updateData, user);
 
         return sendSuccess(res, 'User updated successfully', { updatedUser }, StatusCodes.OK);
     } catch (error) {

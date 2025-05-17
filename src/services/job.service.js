@@ -2,11 +2,12 @@ const { paginate, softDeleteDocument } = require('../utils/queryMongoose.js');
 const Job = require('../schema/jobs.schema.js');
 const Company = require('../schema/companies.schema.js');
 
-const createJob = async(jobData, user) => {
+const createJob = async (jobData, user) => {
     try {
-        const { name, description, companyId, skill, salary, quantity, level, startDate, endDate, location } = jobData
-        if (!name || !description || !companyId || !salary || !quantity || !level || !startDate || !endDate || !location) {
-            throw new Error('name, description, companyId, salary, quantity, level, location ,startDate và endDate là bắt buộc');
+        const { name, description, companyId, skill, salary, quantity, level, startDate, endDate } = jobData;
+
+        if (!name || !description || !companyId || !salary || !quantity || !level || !startDate || !endDate) {
+            throw new Error('name, description, companyId, salary, quantity, level, startDate và endDate là bắt buộc');
         }
 
         const company = await Company.findById(companyId).where({ isDeleted: false });
@@ -14,16 +15,15 @@ const createJob = async(jobData, user) => {
             throw new Error('Không tìm thấy công ty');
         }
 
-
         const newJob = new Job({
             name,
             description,
-            companyId:{
+            companyId: {
                 _id: company._id,
                 name: company.name,
+                address: company.address,
             },
             skill,
-            location,
             salary,
             quantity,
             level,
@@ -34,14 +34,15 @@ const createJob = async(jobData, user) => {
                 email: user.email,
             },
         });
+
         const savedJob = await newJob.save();
         return savedJob;
-    }
-    catch (error) {
+    } catch (error) {
         console.error('Lỗi khi tạo công việc:', error.message);
         throw new Error(error.message);
     }
-}
+};
+
 const getAllJobs = async(queryParams) => {
     try {
         const jobs = await paginate(Job, queryParams);
