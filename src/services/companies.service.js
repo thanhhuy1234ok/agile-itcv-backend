@@ -69,6 +69,7 @@ const updateCompany = async (id, data, user) => {
         if (data.name) company.name = data.name;
         if (data.description) company.description = data.description;
         if (data.address) company.address = data.address;
+        if (typeof data.isActive === 'boolean') company.isActive = data.isActive;
 
         company.updatedBy = {
             _id: user._id,
@@ -83,6 +84,7 @@ const updateCompany = async (id, data, user) => {
         throw new Error(error.message);
     }
 };
+
 
 const deleteCompany = async (id, user) => {
     try {
