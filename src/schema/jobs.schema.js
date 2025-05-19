@@ -26,6 +26,10 @@ const JobSchema = new mongoose.Schema({
         name: {
             type: String,
             trim: true,
+        },
+        address: {
+            type: String,
+            trim: true,
         }
     },
     location:{

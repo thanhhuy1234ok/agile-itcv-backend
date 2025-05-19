@@ -19,6 +19,7 @@ const createJob = async(jobData, user) => {
             companyId:{
                 _id: company._id,
                 name: company.name,
+                address: company.address,
             },
             skill,
             location,

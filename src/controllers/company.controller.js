@@ -13,7 +13,10 @@ const createCompany = async (req, res) => {
         }
 
        
-        const company = await companiesService.createCompany({ name, description, address }, user);
+        const company = await companiesService.createCompany(
+            { name, description, address, logo },
+            user
+        );
 
         
         return sendSuccess(res, 'Tạo công ty thành công', company, StatusCodes.CREATED);
