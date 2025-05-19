@@ -13,8 +13,6 @@ const createJob = async(jobData, user) => {
         if (!company) {
             throw new Error('Không tìm thấy công ty');
         }
-
-
         const newJob = new Job({
             name,
             description,
@@ -24,8 +22,8 @@ const createJob = async(jobData, user) => {
             },
             skill,
             location,
-            salary,
-            quantity,
+            salary: +salary,
+            quantity: +quantity,
             level,
             startDate,
             endDate,
