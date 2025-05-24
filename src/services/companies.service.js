@@ -65,11 +65,11 @@ const updateCompany = async (id, data, user) => {
             throw new Error('Không tìm thấy công ty');
         }
 
-        // Cập nhật từng trường nếu có truyền vào
         if (data.name) company.name = data.name;
         if (data.description) company.description = data.description;
         if (data.address) company.address = data.address;
         if (typeof data.isActive === 'boolean') company.isActive = data.isActive;
+        if (data.logo) company.logo = data.logo; 
 
         company.updatedBy = {
             _id: user._id,
@@ -84,6 +84,7 @@ const updateCompany = async (id, data, user) => {
         throw new Error(error.message);
     }
 };
+
 
 
 const deleteCompany = async (id, user) => {

@@ -1,5 +1,4 @@
 const User = require('../schema/user.schema');
-const ROLES = require('../constants/role');
 
 class UserFactory {
     static create({ name, email, password, role, phone, address, dateOfBirth }) {
