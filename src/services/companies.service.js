@@ -14,7 +14,7 @@ const createCompany = async (companyData, user) => {
             description,
             address,
             logo: logo || null, 
-            createdBy: {
+            createdBy:{
                 _id: user._id,
                 email: user.email,
             }
@@ -28,8 +28,6 @@ const createCompany = async (companyData, user) => {
         throw new Error(error.message);
     }
 }
-
-
 
 const getAllCompanies = async (queryParams) => {
     try {
