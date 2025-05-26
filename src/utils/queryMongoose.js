@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 
 
 const paginate = async (model, queryParams, populate = '', objectIdFields = []) => {
+  console.log(queryParams)
+  console.log(objectIdFields)  
   const current = parseInt(queryParams.current) || 1;
   const pageSize = parseInt(queryParams.pageSize) || 10;
   const skip = (current - 1) * pageSize;
@@ -15,10 +17,12 @@ const paginate = async (model, queryParams, populate = '', objectIdFields = []) 
 
   const mongoFilter = { isDeleted: false, ...filter };
 
-  // Convert các trường ObjectId nếu có
+  console.log(mongoFilter)
+
   objectIdFields.forEach(field => {
     const parts = field.split('.');
-    const fieldValue = parts.reduce((obj, key) => (obj ? obj[key] : undefined), mongoFilter);
+    const fieldValue = mongoFilter[field];
+    console.log(fieldValue)
     
     if (fieldValue && typeof fieldValue === 'string') {
       try {
@@ -30,7 +34,6 @@ const paginate = async (model, queryParams, populate = '', objectIdFields = []) 
         }
         ref[parts[parts.length - 1]] = objectId;
       } catch {
-        // Nếu không phải ObjectId hợp lệ thì xoá để tránh lỗi query
         let ref = mongoFilter;
         for (let i = 0; i < parts.length - 1; i++) {
           if (!ref[parts[i]]) break;
