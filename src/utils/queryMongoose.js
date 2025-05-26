@@ -3,8 +3,6 @@ const mongoose = require('mongoose');
 
 
 const paginate = async (model, queryParams, populate = '', objectIdFields = []) => {
-  console.log(queryParams)
-  console.log(objectIdFields)  
   const current = parseInt(queryParams.current) || 1;
   const pageSize = parseInt(queryParams.pageSize) || 10;
   const skip = (current - 1) * pageSize;
@@ -17,12 +15,9 @@ const paginate = async (model, queryParams, populate = '', objectIdFields = []) 
 
   const mongoFilter = { isDeleted: false, ...filter };
 
-  console.log(mongoFilter)
-
   objectIdFields.forEach(field => {
     const parts = field.split('.');
     const fieldValue = mongoFilter[field];
-    console.log(fieldValue)
     
     if (fieldValue && typeof fieldValue === 'string') {
       try {
