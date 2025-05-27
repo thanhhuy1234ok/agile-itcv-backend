@@ -3,6 +3,7 @@ const Resume = require('../schema/resume.schema.js');
 const StatusResume = require('../constants/status.resume.js');
 const { analyzeCV } = require('../services/ai.service');
 const path = require('path');
+const fs = require('fs');
 
 // const createResume = async (resumeData, user, cvPath) => {
 //     try {
@@ -87,6 +88,27 @@ const getAllResumes = async (queryParams) => {
     }
 }
 
+const getCvFilePathById = async (id) => {
+
+    const projectRoot = path.resolve(__dirname, '../../');
+
+    const resume = await Resume.findById(id);
+
+    if (!resume || resume.isDeleted) {
+        throw new Error('Resume not found');
+    }
+
+    const filePath = path.join(projectRoot, resume.cvPath);
+
+    console.log('Resolved file path:', filePath);
+
+    if (!fs.existsSync(filePath)) {
+        throw new Error('CV file not found');
+    }
+
+    return filePath;
+};
+
 const getResumeById = async (id) => {
     try {
         const resume = await Resume.findById(id).where({ isDeleted: false });
@@ -170,5 +192,6 @@ module.exports = {
     getResumeById,
     updateResume,
     deleteResume,
-    getResumeByUser
+    getResumeByUser,
+    getCvFilePathById
 }

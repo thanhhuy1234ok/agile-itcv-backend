@@ -1,38 +1,19 @@
+const fs = require('fs');
 const { sendSuccess, sendError } = require('../utils/response.js');
 const StatusCodes = require('../constants/statusCodes');
 const resumeService = require('../services/resume.service.js');
-// const path = require('path');
 
-// const uploadFile = async (req, res) => {
-//     try {
-//         const resumeData = req.body;
-//         const user = req.user;
-//         const file = req.file;
-
-//         if (!file) {
-//             return sendError(res, StatusCodes.BAD_REQUEST, 'No file uploaded');
-//         }
-
-//         const cvPath = path.join('uploads', `company_${resumeData.companyId}`, file.filename);
-
-//         const newResume = await resumeService.createResume(resumeData, user, cvPath);
-
-//         return sendSuccess(res, 'File uploaded and resume created successfully', newResume, StatusCodes.CREATED);
-//     } catch (error) {
-//         return sendError(res, StatusCodes.INTERNAL_SERVER_ERROR, error.message);
-//     }
-// };
-
+// Resume Controllers
 const createResume = async (req, res) => {
     try {
         const resumeData = req.body;
         const user = req.user;
         const resume = await resumeService.createResume(resumeData, user);
-        return sendSuccess(res, 'Resume created successfully', resume, StatusCodes.CREATED,);
+        return sendSuccess(res, 'Resume created successfully', resume, StatusCodes.CREATED);
     } catch (error) {
         return sendError(res, StatusCodes.INTERNAL_SERVER_ERROR, error.message);
     }
-}
+};
 
 const getAllResumes = async (req, res) => {
     try {
@@ -42,7 +23,7 @@ const getAllResumes = async (req, res) => {
     } catch (error) {
         return sendError(res, StatusCodes.INTERNAL_SERVER_ERROR, error.message);
     }
-}
+};
 
 const getResumeById = async (req, res) => {
     try {
@@ -52,7 +33,7 @@ const getResumeById = async (req, res) => {
     } catch (error) {
         return sendError(res, StatusCodes.INTERNAL_SERVER_ERROR, error.message);
     }
-}
+};
 
 const updateResume = async (req, res) => {
     try {
@@ -64,7 +45,7 @@ const updateResume = async (req, res) => {
     } catch (error) {
         return sendError(res, StatusCodes.INTERNAL_SERVER_ERROR, error.message);
     }
-}
+};
 
 const deleteResume = async (req, res) => {
     try {
@@ -75,26 +56,46 @@ const deleteResume = async (req, res) => {
     } catch (error) {
         return sendError(res, StatusCodes.INTERNAL_SERVER_ERROR, error.message);
     }
-}
+};
 
 const getResumeByUserId = async (req, res) => {
     try {
-        const  userId  = req.user;
+        const userId = req.user;
         const resumes = await resumeService.getResumeByUser(userId);
         return sendSuccess(res, 'Resumes fetched successfully', resumes, StatusCodes.OK);
     } catch (error) {
-        console.log("loi");
         return sendError(res, StatusCodes.INTERNAL_SERVER_ERROR, error.message);
     }
-}
+};
 
+
+const downloadCv = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const filePath = await resumeService.getCvFilePathById(id);
+
+        if (!fs.existsSync(filePath)) {
+            return sendError(res, StatusCodes.NOT_FOUND, 'CV file not found');
+        }
+
+        res.download(filePath, (err) => {
+            if (err) {
+                console.error('Error sending file:', err);
+                return sendError(res, StatusCodes.INTERNAL_SERVER_ERROR, 'Error downloading CV');
+            }
+        });
+    } catch (error) {
+        console.error('Error downloading CV:', error);
+        return sendError(res, StatusCodes.INTERNAL_SERVER_ERROR, error.message);
+    }
+};
 
 module.exports = {
-    // uploadFile,
     createResume,
     getAllResumes,
     getResumeById,
     updateResume,
     deleteResume,
     getResumeByUserId,
-}
+    downloadCv
+};
