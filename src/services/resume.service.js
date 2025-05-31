@@ -78,14 +78,21 @@ const createResume = async (resumeData, user) => {
 };
 
 const getAllResumes = async (queryParams) => {
-    try {
-        const resumes = await paginate(Resume, queryParams);
-        return resumes;
-    } catch (error) {
-        console.error('Error fetching resumes:', error);
-        throw new Error('Error fetching resumes: ' + error.message);
-    }
-}
+  try {
+    const populateFields = queryParams.populate ? queryParams.populate.split(',').join(' ') : ''; 
+
+    const resumes = await paginate(
+      Resume,
+      queryParams,
+      populateFields,
+    );
+
+    return resumes;
+  } catch (error) {
+    console.error('Error fetching resumes:', error);
+    throw new Error('Error fetching resumes: ' + error.message);
+  }
+};
 
 const getResumeById = async (id) => {
     try {

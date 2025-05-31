@@ -41,15 +41,16 @@ const createJob = async(jobData, user) => {
         throw new Error(error.message);
     }
 }
-const getAllJobs = async(queryParams) => {
+const getAllJobs = async (queryParams) => {
     try {
-        const jobs = await paginate(Job, queryParams);
+        const objectIdFields = ['companyId._id'];
+        const jobs = await paginate(Job, queryParams, '', objectIdFields);
         return jobs;
     } catch (error) {
         console.error('Lỗi khi lấy danh sách công việc:', error.message);
         throw new Error(error.message);
     }
-}
+};
 const getJobById = async(id) => {
     try {
         const job = await Job.findById(id).where({ isDeleted: false });

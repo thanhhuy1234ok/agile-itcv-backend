@@ -4,12 +4,12 @@ const StatusCodes = require('../constants/statusCodes');
 
 const createCompany = async (req, res) => {
     try {
-        const { name, description, address } = req.body;
+        const { name, description, address, logo } = req.body;
         const user = req.user;
 
         
-        if (!name || !description || !address) {
-            return sendError(res, StatusCodes.BAD_REQUEST, 'Name, description và address là bắt buộc');
+        if (!name || !description || !address || !logo) {
+            return sendError(res, StatusCodes.BAD_REQUEST, 'Name, description, logo và address là bắt buộc');
         }
 
        

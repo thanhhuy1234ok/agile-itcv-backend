@@ -33,25 +33,22 @@ const login = async (req, res) => {
       secure: process.env.NODE_ENV === "production",
     });
 
-    return sendSuccess(
-      res,
-      "Đăng nhập thành công",
-      {
-        access_Token: accessToken,
-        refresh_Token: refreshToken,
-        user: {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        },
-      },
-      StatusCodes.OK
-    );
-  } catch (error) {
-    console.error("Login Error:", error.message);
-    return sendError(res, StatusCodes.UNAUTHORIZED, error.message);
-  }
+        return sendSuccess(res, 'Đăng nhập thành công', {
+            access_Token: accessToken,
+            refresh_Token: refreshToken,
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt
+            },
+        }, StatusCodes.OK);
+    } catch (error) {
+        console.error('Login Error:', error.message);
+        return sendError(res, StatusCodes.UNAUTHORIZED, error.message);
+    }
 };
 
 const refreshAccessToken = async (req, res) => {

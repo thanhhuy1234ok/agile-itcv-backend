@@ -10,15 +10,15 @@ class Database {
     return Database.instance;
   }
 
-  async connect() {
-    try {
-      const dbUri = env === "dev" ? dbUriDev : dbUriProd;
-      await mongoose.connect(dbUri);
-      console.log("✅ Database connection successful");
-    } catch (error) {
-      console.error("❌ Database connection error:", error);
+    async connect() {
+        try {
+            // const dbUri = env === 'dev' ? dbUriDev : dbUriProd;
+            await mongoose.connect(dbUriDev);
+            console.log('✅ Database connection successful');
+        } catch (error) {
+            console.error('❌ Database connection error:', error);
+        }
     }
-  }
 }
 
 const instance = new Database();
