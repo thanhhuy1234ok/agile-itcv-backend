@@ -11,7 +11,7 @@ app.set('view engine', 'hbs');
 app.set('templates', path.join(__dirname, 'templates'));
 
 app.use(cors({
-    origin: 'http://localhost:3000', // Chỉ cho phép từ FE ở port 3000
+    origin: 'http://localhost:3000,https://agile-itcv-frontend.vercel.app', // Chỉ cho phép từ FE ở port 3000
     methods: ['GET', 'POST', 'PUT','PATCH', 'DELETE'],
     credentials: true // Nếu cần gửi cookie qua cross-origin
 }));
