@@ -26,7 +26,6 @@ const createPermission = async (req, res) => {
 const addPermissionToRole = async (req, res) => {
     try {
         const { roleId, permissionIds } = req.body;
-        console.log(permissionIds)
 
         if (!roleId || !permissionIds) {
             return sendError(res, StatusCodes.BAD_REQUEST, 'roleId và permissionIds là bắt buộc');

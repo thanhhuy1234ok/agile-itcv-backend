@@ -5,13 +5,13 @@ const checkPermission = require('../middlewares/permission.middleware');
 
 const userRouter = express.Router();
 
-// Route public 
-userRouter.get('/userDetail/:id', userController.getUserById);
+userRouter.use(authMiddleware)
+userRouter.use(checkPermission)
 
-// Các route cần auth và kiểm tra permission
-userRouter.get('/allUsers',authMiddleware, checkPermission, userController.getAllUsers);
-userRouter.post('/', authMiddleware, checkPermission, userController.createUser);
-userRouter.put('/updateUser/:id', authMiddleware, checkPermission, userController.updateUser);
-userRouter.delete('/deleteUser/:id', authMiddleware, checkPermission, userController.deleteUser);
+userRouter.get('/userDetail/:id', userController.getUserById);
+userRouter.get('/allUsers', userController.getAllUsers);
+userRouter.post('/', userController.createUser);
+userRouter.put('/updateUser/:id', userController.updateUser);
+userRouter.delete('/deleteUser/:id', userController.deleteUser);
 
 module.exports = userRouter;
