@@ -21,6 +21,7 @@ const createUser = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
     try {
+        console.log(req)
         const result = await userService.getAllUsers(req.query); 
         return sendSuccess(res, 'Users retrieved successfully', { result }, StatusCodes.OK);
     } catch (error) {
