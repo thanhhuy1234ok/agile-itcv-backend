@@ -1,18 +1,23 @@
 const mongoose = require('mongoose');
 
-const RoleSchema = new mongoose.Schema({
+const PermissionSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        trim: true,
+        trim: true, 
     },
-    permissions: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Permissions',
-    }],
-    description: {
+    method: {
         type: String,
         required: true,
+        enum: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    },
+    path: {
+        type: String,
+        required: true,
+        trim: true, 
+    },
+    description: {
+        type: String,
         trim: true,
     },
     isActive: {
@@ -69,4 +74,4 @@ const RoleSchema = new mongoose.Schema({
     },
 });
 
-module.exports = mongoose.model('Roles', RoleSchema);
+module.exports = mongoose.model('Permissions', PermissionSchema);
