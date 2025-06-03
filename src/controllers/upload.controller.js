@@ -1,24 +1,26 @@
-const { sendSuccess, sendError } = require('../utils/response');
-const statusCodes = require('../constants/statusCodes')
+const { sendError, sendSuccess } = require('../utils/response');
+const statusCodes = require('../constants/statusCodes');
 
 const uploadFile = (req, res) => {
-    req.upload(req, res, function (err) {
-      if (err) {
-        console.error('Upload error:', err);
-        return sendError(res, statusCodes.INTERNAL_SERVER_ERROR, 'Lỗi upload');
-      }
-  
-      if (!req.file) {
-        return sendError(res, statusCodes.BAD_REQUEST, 'Không tìm thấy file đã upload');
-      }
-  
-      if (req.headers['x-file-type'] === 'image') {
-        return sendSuccess(res, 'Tải ảnh thành công', {imageUrl: req.file.path, public_id: req.file.filename}, statusCodes.OK);
-      }
-  
-      return sendSuccess(res, 'Tải file PDF thành công', {fileName: req.file.filename,filePath: req.file.path}, statusCodes.OK);
-    });
-  };
-  
-  module.exports = { uploadFile };
+  req.upload(req, res, function (err) {
+    if (err) {
+      return sendError(res, statusCodes.BAD_REQUEST, err.message || 'Tải file thất bại');
+    }
+
+    const file = req.file;
+    if (!file || !file.path) {
+      return sendError(res, statusCodes.BAD_REQUEST, 'Không có file nào được tải lên');
+    }
+
+    return sendSuccess(res, 'Tải file thành công',
+      {
+        url: file.path,            
+        originalName: file.originalname,
+      }, statusCodes.OK
+    );
+  });
+};
+
+module.exports = { uploadFile };
+
   
