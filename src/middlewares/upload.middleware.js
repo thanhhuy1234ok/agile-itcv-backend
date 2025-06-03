@@ -1,68 +1,68 @@
 const multer = require('multer');
-const fs = require('fs');
 const path = require('path');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinary = require('../configs/cloudinary');
-const {sendError} = require('../utils/response')
-const statusCodes = require('../constants/statusCodes')
+const { sendError } = require('../utils/response');
+const statusCodes = require('../constants/statusCodes');
 
-// Storage PDF (Local)
-const pdfStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const companyId = req.body.companyId || 'default';
-    const dir = `uploads/company_${companyId}`;
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    cb(null, dir);
-  },
-  filename: (req, file, cb) => {
-    const userId = req.user._id;
-    const fileName = `${userId}_${file.originalname}`;
-    cb(null, fileName);
-  }
-});
-
-// Storage Ảnh (Cloudinary)
-const imageStorage = new CloudinaryStorage({
+const cloudinaryStorage = new CloudinaryStorage({
   cloudinary,
-  params: {
-    folder: 'images',
-    format: async () => 'jpg',
-    public_id: (req, file) => {
-      const originalName = path.parse(file.originalname).name;
-      return originalName;
-    },
+  params: async (req, file) => {
+    const fileType = req.headers['x-file-type'];
+    const originalName = path.parse(file.originalname).name;
+    const userId = req.user?._id;
+
+    if (!userId) {
+      throw new Error('Thiếu userId trong token xác thực');
+    }
+
+    let folder = '';
+    let public_id = '';
+
+    if (fileType === 'pdf') {
+      const companyId = req.body.companyId;
+      if (!companyId) {
+        throw new Error('Thiếu companyId trong form-data');
+      }
+      folder = `pdfs/company_${companyId}`;
+      public_id = `${userId}_${originalName}`;
+    } else if (fileType === 'image') {
+      folder = 'images';
+      public_id = originalName;
+    } else {
+      throw new Error('Header x-file-type không hợp lệ.');
+    }
+
+    return {
+      folder,
+      public_id,
+      resource_type: fileType === 'pdf' ? 'raw' : 'image',
+      format: fileType === 'pdf' ? 'pdf' : 'jpg',
+    };
   },
 });
 
-// Middleware chọn storage theo x-file-type
 const chooseUploader = (req, res, next) => {
   const fileType = req.headers['x-file-type'];
 
-  if (fileType === 'pdf') {
-    req.upload = multer({
-      storage: pdfStorage,
-      fileFilter: (req, file, cb) => {
-        if (file.mimetype === 'application/pdf') cb(null, true);
-        else cb(new Error('Chỉ cho phép file PDF'));
-      },
-      limits: { fileSize: 5 * 1024 * 1024 }
-    }).single('file');
-  } else if (fileType === 'image') {
-    req.upload = multer({
-      storage: imageStorage,
-      fileFilter: (req, file, cb) => {
-        if (file.mimetype.startsWith('image/')) cb(null, true);
-        else cb(new Error('Chỉ cho phép file ảnh'));
-      },
-      limits: { fileSize: 3 * 1024 * 1024 }
-    }).single('file');
-  } else {
+  if (!['pdf', 'image'].includes(fileType)) {
     return sendError(res, statusCodes.BAD_REQUEST, 'Header x-file-type không hợp lệ. Chọn pdf hoặc image.');
   }
 
+  const fileFilter = (req, file, cb) => {
+    if (fileType === 'pdf' && file.mimetype === 'application/pdf') return cb(null, true);
+    if (fileType === 'image' && file.mimetype.startsWith('image/')) return cb(null, true);
+    return cb(new Error(`Chỉ cho phép file ${fileType === 'pdf' ? 'PDF' : 'ảnh'}`));
+  };
+
+  req.upload = multer({
+    storage: cloudinaryStorage,
+    fileFilter,
+    limits: { fileSize: fileType === 'pdf' ? 5 * 1024 * 1024 : 3 * 1024 * 1024 },
+  }).single('file');
+
   next();
 };
+
 
 module.exports = { chooseUploader };
