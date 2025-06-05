@@ -2,6 +2,7 @@ const express = require('express');
 const {port} =require('./configs/env.config.js');
 const mainRouter =  require('./routers/router.js');
 require('./configs/db.config.js');
+const sendJobNotificationsCron = require('../src/configs/sendJobNotifications.js')
 const app = express();
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -26,6 +27,7 @@ app.use('/uploads', express.static(path.join(__dirname,'../uploads')));
 
 app.use('/api/v1', mainRouter);
 
+sendJobNotificationsCron();
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);

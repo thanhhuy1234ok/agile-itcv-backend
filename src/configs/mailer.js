@@ -3,7 +3,7 @@ const hbs = require('hbs');
 const path = require('path');
 const fs = require('fs');
 const configs = require('../configs/env.config.js');
-const mailOptions = require('../configs/mailer.option.js');
+// const mailOptions = require('../configs/mailer.option.js');
 const mailerOption = require('../configs/mailer.option.js');
 
 const transporter = nodemailer.createTransport({

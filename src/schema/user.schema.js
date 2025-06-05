@@ -40,6 +40,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
         default: 'https://res.cloudinary.com/ddhjlaqjn/image/upload/v1746519989/images/itviec.jpg',
     },
+    skills: {
+        type: [String],
+        default: [],
+    },
     refresh_Token: {
         type: String,
         default: null,
