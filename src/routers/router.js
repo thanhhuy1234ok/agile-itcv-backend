@@ -8,6 +8,7 @@ const resumeRoutes = require('./resume.router.js');
 const permissionRoutes = require('./permission.router.js')
 const fileRouter = require('./files.router.js');
 const mailerRouter = require('./mailer.router.js');
+const jobNotificationRouter = require('./jobNotification.routes.js')
 const router = express.Router();
 
 router.use('/users', userRoutes);
@@ -19,6 +20,7 @@ router.use('/resumes', resumeRoutes);
 router.use('/permissions', permissionRoutes)
 router.use('/files', fileRouter);
 router.use('/mailer', mailerRouter);
+router.use('/jobNotification', jobNotificationRouter)
 
 module.exports =  router;
  
