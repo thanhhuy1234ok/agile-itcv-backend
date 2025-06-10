@@ -10,6 +10,10 @@ const JobNotificationSchema = new mongoose.Schema({
     type: [String],
     default: [],
   },
+  emailNotificationsEnabled: {
+    type: Boolean,
+    default: true, 
+  },
 }, {
   timestamps: true,
 }); 
