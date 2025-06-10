@@ -2,6 +2,7 @@ const cron = require('node-cron');
 const User = require('../schema/user.schema');
 const Job = require('../schema/jobs.schema');
 const JobNotification = require('../schema/jobNotification.schema');
+const { formatDate } = require('../utils/formater.dayjs');
 const { sendMail } = require('./mailer');
 
 const sendJobNotificationsCron = () => {
@@ -29,7 +30,12 @@ const sendJobNotificationsCron = () => {
 
           const jobNotification = await JobNotification.findOne({ userId: user._id });
 
-          if (!jobNotification || !Array.isArray(jobNotification.skills) || jobNotification.skills.length === 0) {
+          if (!jobNotification || jobNotification.emailNotificationsEnabled === false) {
+            console.log(`⚠️ User ${user._id} đã tắt gửi mail, bỏ qua.`);
+            continue;
+          }
+
+          if (!Array.isArray(jobNotification.skills) || jobNotification.skills.length === 0) {
             console.log(`⚠️ User ${user._id} không có skills trong JobNotification, bỏ qua`);
             continue;
           }
@@ -45,49 +51,29 @@ const sendJobNotificationsCron = () => {
             continue;
           }
 
-          // Chuẩn bị dữ liệu cho email tổng hợp
-          const jobListHtml = matchedJobs.map(job => `
-            <div style="
-                border: 1px solid #e0e0e0;
-                border-radius: 8px;
-                padding: 15px;
-                margin-bottom: 20px;
-                background-color: #ffffff;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            ">
-                <h3 style="color: #0056b3; margin-top: 0; margin-bottom: 10px;">${job.name}</h3>
-                <p style="margin: 5px 0;"><strong>Công ty:</strong> ${job.companyId?.name || 'Công ty'}</p>
-                <p style="margin: 5px 0;"><strong>Địa điểm:</strong> ${job.location}</p>
-                <p style="margin: 5px 0;"><strong>Mức lương:</strong> ${job.salary}</p>
-                <p style="margin: 5px 0;"><strong>Ngày kết thúc:</strong> ${job.endDate?.toLocaleDateString() || ''}</p>
-                <p style="margin: 5px 0; font-size: 0.9em; color: #555;">${job.description.substring(0, 150)}...</p>
-                <a href="[LINK_TO_JOB_DETAIL/${job._id}]" style="
-                    display: inline-block;
-                    background-color: #007bff;
-                    color: #ffffff;
-                    padding: 8px 15px;
-                    border-radius: 5px;
-                    text-decoration: none;
-                    margin-top: 10px;
-                    font-size: 0.9em;
-                ">Xem chi tiết</a>
-            </div>
-        `).join('');
+          const formattedJobs = matchedJobs.map(job => ({
+            _id: job._id,
+            name: job.name,
+            location: job.location,
+            salary: job.salary,
+            description: job.description?.substring(0, 150) + '...',
+            endDate: formatDate(job.endDate) || '',
+            companyName: job.companyId?.name || 'Công ty',
+          }));
 
-          console.log(`📤 Gửi mail tổng hợp các job tới user "${user.email}"`);
+          console.log(`📤 Gửi mail tới user "${user.email}" với ${formattedJobs.length} job`);
 
           await sendMail(
             user.email,
-            `Cơ hội việc làm phù hợp dành cho bạn (${matchedJobs.length} việc làm)`,
-            'jobNotificationAggregate', // Bạn có thể muốn một template mới cho email tổng hợp
+            `Cơ hội việc làm phù hợp dành cho bạn (${formattedJobs.length} việc làm)`,
+            'jobNotificationAggregate',
             {
               userName: user.name || 'Ứng viên',
-              emailContent: jobListHtml // Truyền nội dung HTML đã tạo
+              jobs: formattedJobs,
             }
           );
 
-          console.log(`✅ Đã gửi mail tổng hợp đến user "${user.email}" với ${matchedJobs.length} job.`);
-
+          console.log(`✅ Đã gửi mail đến user "${user.email}"`);
         } catch (userErr) {
           console.error(`❌ Lỗi khi xử lý user ${user._id}:`, userErr);
         }

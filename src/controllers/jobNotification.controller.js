@@ -30,13 +30,19 @@ const createJobNotification = async (req, res) => {
 const updateJobNotification = async (req, res) => {
   try {
     const user = req.user;
-    const { skills } = req.body;
+    const { skills, emailNotificationsEnabled } = req.body;
 
-    if (!skills || !Array.isArray(skills)) {
+    if (skills && !Array.isArray(skills)) {
       return sendError(res, StatusCodes.BAD_REQUEST, 'Skills phải là một mảng');
     }
 
-    const jobNotification = await updateJobNotificationService(user._id, skills);
+    const updateData = {};
+    if (skills) updateData.skills = skills;
+    if (typeof emailNotificationsEnabled === 'boolean') {
+      updateData.emailNotificationsEnabled = emailNotificationsEnabled;
+    }
+
+    const jobNotification = await updateJobNotificationService(user._id, updateData);
 
     return sendSuccess(res, 'Cập nhật JobNotification thành công', jobNotification, StatusCodes.OK);
   } catch (error) {

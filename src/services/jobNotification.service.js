@@ -14,14 +14,15 @@ const createJobNotificationService = async ({ userId, skills }) => {
   return jobNotification;
 };
 
-const updateJobNotificationService = async (userId, skills) => {
-  if (!skills || !Array.isArray(skills)) {
+const updateJobNotificationService = async (userId, updateData) => {
+  
+  if (updateData.skills && !Array.isArray(updateData.skills)) {
     throw new Error('Skills phải là một mảng.');
   }
 
   const jobNotification = await JobNotification.findOneAndUpdate(
     { userId },
-    { skills },
+    updateData,
     { new: true }
   );
 
