@@ -1,6 +1,7 @@
 const express = require('express');
 const {port} =require('./configs/env.config.js');
 const mainRouter =  require('./routers/router.js');
+const sendJobNotificationsCron = require('./configs/sendJobNotifications.js')
 require('./configs/db.config.js');
 const sendJobNotificationsCron = require('../src/configs/sendJobNotifications.js')
 const app = express();

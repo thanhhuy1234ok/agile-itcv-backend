@@ -6,19 +6,16 @@ const JobNotificationSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
-  jobId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Jobs',
-    required: true,
+  skills: {
+    type: [String],
+    default: [],
   },
-  sentAt: {
-    type: Date,
-    default: Date.now,
-  }
+  emailNotificationsEnabled: {
+    type: Boolean,
+    default: true, 
+  },
 }, {
   timestamps: true,
-});
-
-JobNotificationSchema.index({ userId: 1, jobId: 1 }, { unique: true }); 
+}); 
 
 module.exports = mongoose.model('JobNotification', JobNotificationSchema);

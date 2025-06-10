@@ -2,27 +2,23 @@ const cron = require('node-cron');
 const User = require('../schema/user.schema');
 const Job = require('../schema/jobs.schema');
 const JobNotification = require('../schema/jobNotification.schema');
+const { formatDate } = require('../utils/formater.dayjs');
 const { sendMail } = require('./mailer');
 
-const jobMatchesUserSkills = (jobSkills = [], userSkills = []) =>
-  jobSkills.some(skill => userSkills.includes(skill));
-
 const sendJobNotificationsCron = () => {
-    
   cron.schedule('* * * * *', async () => {
     try {
       console.log('🔔 Bắt đầu kiểm tra job phù hợp để gửi mail...');
 
       const users = await User.find({
         isDeleted: false,
-        skills: { $exists: true, $ne: [] },
-        'role.name': 'NORMAL USER'
+        'role.name': 'NORMAL USER',
       });
 
       const jobs = await Job.find({
         isActive: true,
         endDate: { $gte: new Date() },
-        isDeleted: false
+        isDeleted: false,
       });
 
       for (const user of users) {
@@ -32,50 +28,52 @@ const sendJobNotificationsCron = () => {
             continue;
           }
 
-          const userSkills = user.skills || [];
+          const jobNotification = await JobNotification.findOne({ userId: user._id });
+
+          if (!jobNotification || jobNotification.emailNotificationsEnabled === false) {
+            console.log(`⚠️ User ${user._id} đã tắt gửi mail, bỏ qua.`);
+            continue;
+          }
+
+          if (!Array.isArray(jobNotification.skills) || jobNotification.skills.length === 0) {
+            console.log(`⚠️ User ${user._id} không có skills trong JobNotification, bỏ qua`);
+            continue;
+          }
+
+          const userSkills = jobNotification.skills;
+
           const matchedJobs = jobs.filter(job =>
-            jobMatchesUserSkills(job.skill || [], userSkills)  
+            job.skill && job.skill.some(skill => userSkills.includes(skill))
           );
 
-          if (matchedJobs.length === 0) continue; 
-
-          for (const job of matchedJobs) {
-            try {
-              const alreadyNotified = await JobNotification.findOne({
-                userId: user._id,
-                jobId: job._id,
-              });
-
-              if (!alreadyNotified) {
-                console.log(`📤 Gửi mail job "${job.name}" tới user "${user.email}"`);
-
-                await sendMail(
-                  user.email,
-                  `Cơ hội việc làm phù hợp: ${job.name}`,
-                  'jobNotification',
-                  {
-                    userName: user.name || 'Ứng viên',
-                    jobName: job.name,
-                    jobDescription: job.description,
-                    companyName: job.companyId?.name || 'Công ty',
-                    location: job.location,
-                    salary: job.salary,
-                    startDate: job.startDate?.toLocaleDateString() || '',
-                    endDate: job.endDate?.toLocaleDateString() || '',
-                  }
-                );
-
-                await JobNotification.create({
-                  userId: user._id,
-                  jobId: job._id,
-                });
-
-                console.log(`✅ Đã gửi mail "${job.name}" đến user "${user.email}"`);
-              }
-            } catch (jobErr) {
-              console.error(`❌ Lỗi khi xử lý job ${job._id} cho user ${user._id}:`, jobErr);
-            }
+          if (matchedJobs.length === 0) {
+            console.log(`ℹ️ Không tìm thấy job phù hợp cho user ${user._id}, bỏ qua.`);
+            continue;
           }
+
+          const formattedJobs = matchedJobs.map(job => ({
+            _id: job._id,
+            name: job.name,
+            location: job.location,
+            salary: job.salary,
+            description: job.description?.substring(0, 150) + '...',
+            endDate: formatDate(job.endDate) || '',
+            companyName: job.companyId?.name || 'Công ty',
+          }));
+
+          console.log(`📤 Gửi mail tới user "${user.email}" với ${formattedJobs.length} job`);
+
+          await sendMail(
+            user.email,
+            `Cơ hội việc làm phù hợp dành cho bạn (${formattedJobs.length} việc làm)`,
+            'jobNotificationAggregate',
+            {
+              userName: user.name || 'Ứng viên',
+              jobs: formattedJobs,
+            }
+          );
+
+          console.log(`✅ Đã gửi mail đến user "${user.email}"`);
         } catch (userErr) {
           console.error(`❌ Lỗi khi xử lý user ${user._id}:`, userErr);
         }

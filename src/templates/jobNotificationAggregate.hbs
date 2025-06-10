@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cơ Hội Việc Làm Dành Cho Bạn</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    h1 {
+      color: #0056b3;
+    }
+    table.job-card {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+    table.job-card td {
+      padding: 8px;
+      font-size: 14px;
+    }
+    a.button-link {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 8px 12px;
+      background-color: #007bff;
+      color: #fff !important;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 12px;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Chào bạn {{userName}},</h1>
+    <p>Chúng tôi đã tìm thấy một số cơ hội việc làm mới phù hợp với kỹ năng của bạn:</p>
+
+    <hr />
+
+    {{#each jobs}}
+      <table class="job-card">
+        <tr>
+          <td colspan="2" style="font-size: 18px; font-weight: bold; color: #007bff;">
+            {{name}}
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Công ty:</strong></td>
+          <td>{{companyName}}</td>
+        </tr>
+        <tr>
+          <td><strong>Địa điểm:</strong></td>
+          <td>{{location}}</td>
+        </tr>
+        <tr>
+          <td><strong>Mức lương:</strong></td>
+          <td>{{salary}}</td>
+        </tr>
+        <tr>
+          <td><strong>Mô tả:</strong></td>
+          <td>{{description}}</td>
+        </tr>
+        <tr>
+          <td><strong>Hạn nộp hồ sơ:</strong></td>
+          <td>{{endDate}}</td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <a class="button-link" href="https://your-website.com/jobs/{{_id}}" target="_blank">Xem chi tiết</a>
+          </td>
+        </tr>
+      </table>
+    {{/each}}
+
+    <p>Chúc bạn một ngày tốt lành!</p>
+    <p>Trân trọng,<br/>Đội ngũ của bạn</p>
+
+    <div class="footer">
+      <p>Đây là email tự động, vui lòng không trả lời email này.</p>
+      <p>&copy; 2025 Công Ty Của Bạn. Mọi quyền được bảo lưu.</p>
+    </div>
+  </div>
+</body>
+</html>
