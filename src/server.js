@@ -27,7 +27,7 @@ app.use('/uploads', express.static(path.join(__dirname,'../uploads')));
 
 app.use('/api/v1', mainRouter);
 
-sendJobNotificationsCron();
+// sendJobNotificationsCron();
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);

@@ -2,6 +2,7 @@ const fs = require('fs');
 const pdfParse = require('pdf-parse');
 const Job = require('../schema/jobs.schema.js');
 const path = require('path');
+const { default: axios } = require('axios');
 
 const knownSkills = [
     'node.js', 'react', 'express', 'mongodb', 'docker', 'rest api',
@@ -36,11 +37,17 @@ const extractLanguages = (text) => {
 };
 
 async function analyzeCV(cvPath, jobId) {
-    const fullPath = path.resolve(process.cwd(), cvPath);
+    let buffer;
 
-    if (!fs.existsSync(fullPath)) throw new Error(`Không tìm thấy file: ${fullPath}`);
+    if (cvPath.startsWith('http://') || cvPath.startsWith('https://')) {
+        const response = await axios.get(cvPath, { responseType: 'arraybuffer' });
+        buffer = Buffer.from(response.data);
+    } else {
+        const fullPath = path.resolve(process.cwd(), cvPath);
+        if (!fs.existsSync(fullPath)) throw new Error(`Không tìm thấy file: ${fullPath}`);
+        buffer = fs.readFileSync(fullPath);
+    }
 
-    const buffer = fs.readFileSync(fullPath);
     const pdfData = await pdfParse(buffer);
     const cvText = pdfData.text;
 
