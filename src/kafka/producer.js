@@ -12,9 +12,7 @@ const connectProducer = async () => {
   console.log('✅ Kafka Producer connected');
 };
 
-
-
 module.exports = {
-  connectProducer,
   kafkaProducer,
+  connectProducer,
 };

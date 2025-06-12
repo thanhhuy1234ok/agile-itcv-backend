@@ -1,7 +1,6 @@
 const { sendSuccess, sendError } = require('../utils/response.js');
 const StatusCodes = require('../constants/statusCodes');
 const resumeService = require('../services/resume.service.js');
-const { kafkaProducer } = require('../kafka/config.producer.js');
 // const path = require('path');
 
 // const uploadFile = async (req, res) => {
@@ -27,24 +26,9 @@ const { kafkaProducer } = require('../kafka/config.producer.js');
 const createResume = async (req, res) => {
     try {
         const resumeData = req.body;
-        const user = req.user; 
-        await kafkaProducer.send({
-            topic: 'cv_applied',
-            messages: [
-                {
-                key: user._id.toString(),
-                value: JSON.stringify({
-                    userId: user._id,
-                    userName: user.name,
-                    email: user.email,
-                    companyId: resumeData.companyId,
-                    jobId: resumeData.jobId,
-                    url: resumeData.url,
-                }),
-                },
-            ],
-            });
-        return sendSuccess(res, 'Resume created successfully', null, StatusCodes.CREATED);
+        const user = req.user;
+        const resume = await resumeService.createResume(resumeData, user);
+        return sendSuccess(res, 'Resume created successfully', resume, StatusCodes.CREATED,);
     } catch (error) {
         return sendError(res, StatusCodes.INTERNAL_SERVER_ERROR, error.message);
     }

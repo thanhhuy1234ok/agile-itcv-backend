@@ -2,42 +2,78 @@ const { paginate, softDeleteDocument } = require('../utils/queryMongoose.js');
 const Resume = require('../schema/resume.schema.js');
 const StatusResume = require('../constants/status.resume.js');
 const { analyzeCV } = require('../services/ai.service');
+const path = require('path');
 
-const createResume = async (data) => {
+// const createResume = async (resumeData, user, cvPath) => {
+//     try {
+//         const { companyId, jobId } = resumeData;
+//         const newResumer = new Resume({
+//             companyId,
+//             jobId,
+//             userId: user._id,
+//             email: user.email,
+//             status: StatusResume.PENDING,
+//             createdBy: {
+//                 _id: user._id,
+//                 email: user.email
+//             },
+//             history: [
+//                 {
+//                     status: StatusResume.PENDING,
+//                     updatedBy: {
+//                         _id: user._id,
+//                         email: user.email
+//                     }
+//                 }
+//             ]
+//         });
+//         const resume = await newResumer.save();
+//         return resume;
+
+//     } catch (error) {
+//         console.error('Error creating resume:', error);
+//         throw new Error('Error creating resume: ' + error.message);
+//     }
+// }
+
+const createResume = async (resumeData, user) => {
     try {
-        const { userId, email, companyId, jobId, url } = data;
+        const { companyId, jobId ,url} = resumeData;
 
-        const analysisResult = await analyzeCV(url, jobId);
+        const analysisResult = await analyzeCV(url,jobId);
 
         const newResume = new Resume({
             companyId,
             jobId,
-            userId,
-            email,
-            cvPath: url,
-            status: StatusResume.PENDING,
+            userId: user._id,
+            email: user.email,
+            cvPath: url, 
+            status: StatusResume.PENDING, 
             score: analysisResult.score,
             matchedSkills: analysisResult.matchedSkills,
             analysis: analysisResult.analysis,
             createdBy: {
-                _id: userId,
-                email: email
+                _id: user._id,
+                email: user.email
             },
             history: [
                 {
-                    status: StatusResume.PENDING,
+                    status: StatusResume.PENDING, 
                     updatedBy: {
-                        _id: userId,
-                        email: email
+                        _id: user._id,
+                        email: user.email
                     }
                 }
             ]
         });
 
-        await newResume.save();
-        console.log('✅ Resume created successfully');
+        const resume = await newResume.save();
+
+        return resume;
+
     } catch (error) {
-        console.error('❌ Error creating resume:', error);
+        console.error('Error creating resume:', error);
+        throw new Error('Error creating resume: ' + error.message);
     }
 };
 

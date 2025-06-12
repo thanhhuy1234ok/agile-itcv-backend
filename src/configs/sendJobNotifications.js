@@ -3,7 +3,7 @@ const User = require('../schema/user.schema');
 const Job = require('../schema/jobs.schema');
 const JobNotification = require('../schema/jobNotification.schema');
 const { formatDate } = require('../utils/formater.dayjs');
-const { kafkaProducer } = require('../kafka/config.producer');
+const { kafkaProducer } = require('../kafka/producer');
 
 const sendJobNotificationsCron = () => {
   cron.schedule('* * * * *', async () => {
