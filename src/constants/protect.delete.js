@@ -1,4 +1,4 @@
 module.exports ={
-    PROTECT_EMAIL: 'superadmin@gmail.com',
-    PROTECT_ROLE: 'SuperAdmin',
+    PROTECT_EMAIL: 'admin@gmail.com',
+    PROTECT_ROLE: 'ADMIN',
 }
