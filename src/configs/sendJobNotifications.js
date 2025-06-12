@@ -3,12 +3,12 @@ const User = require('../schema/user.schema');
 const Job = require('../schema/jobs.schema');
 const JobNotification = require('../schema/jobNotification.schema');
 const { formatDate } = require('../utils/formater.dayjs');
-const { sendMail } = require('./mailer');
+const { producer } = require('../kafka/producer');
 
 const sendJobNotificationsCron = () => {
   cron.schedule('* * * * *', async () => {
     try {
-      console.log('🔔 Bắt đầu kiểm tra job phù hợp để gửi mail...');
+      console.log('🔔 Bắt đầu kiểm tra job phù hợp để gửi vào Kafka...');
 
       const users = await User.find({
         isDeleted: false,
@@ -21,35 +21,23 @@ const sendJobNotificationsCron = () => {
         isDeleted: false,
       });
 
+      const messages = [];
+
       for (const user of users) {
         try {
-          if (!user.email) {
-            console.warn(`⚠️ User ${user._id} không có email, bỏ qua`);
-            continue;
-          }
+          if (!user.email) continue;
 
           const jobNotification = await JobNotification.findOne({ userId: user._id });
-
-          if (!jobNotification || jobNotification.emailNotificationsEnabled === false) {
-            console.log(`⚠️ User ${user._id} đã tắt gửi mail, bỏ qua.`);
-            continue;
-          }
-
-          if (!Array.isArray(jobNotification.skills) || jobNotification.skills.length === 0) {
-            console.log(`⚠️ User ${user._id} không có skills trong JobNotification, bỏ qua`);
-            continue;
-          }
+          if (!jobNotification?.emailNotificationsEnabled) continue;
 
           const userSkills = jobNotification.skills;
+          if (!Array.isArray(userSkills) || userSkills.length === 0) continue;
 
           const matchedJobs = jobs.filter(job =>
             job.skill && job.skill.some(skill => userSkills.includes(skill))
           );
 
-          if (matchedJobs.length === 0) {
-            console.log(`ℹ️ Không tìm thấy job phù hợp cho user ${user._id}, bỏ qua.`);
-            continue;
-          }
+          if (matchedJobs.length === 0) continue;
 
           const formattedJobs = matchedJobs.map(job => ({
             _id: job._id,
@@ -61,27 +49,31 @@ const sendJobNotificationsCron = () => {
             companyName: job.companyId?.name || 'Công ty',
           }));
 
-          console.log(`📤 Gửi mail tới user "${user.email}" với ${formattedJobs.length} job`);
-
-          await sendMail(
-            user.email,
-            `Cơ hội việc làm phù hợp dành cho bạn (${formattedJobs.length} việc làm)`,
-            'jobNotificationAggregate',
-            {
+          messages.push({
+            key: user.email, // optional, để Kafka phân phối đều theo email
+            value: JSON.stringify({
+              email: user.email,
               userName: user.name || 'Ứng viên',
               jobs: formattedJobs,
-            }
-          );
-
-          console.log(`✅ Đã gửi mail đến user "${user.email}"`);
+            }),
+          });
         } catch (userErr) {
           console.error(`❌ Lỗi khi xử lý user ${user._id}:`, userErr);
         }
       }
 
-      console.log('✅ Hoàn thành gửi mail job phù hợp cho user.');
+      if (messages.length > 0) {
+        await producer.send({
+          topic: 'job-mail-topic',
+          messages,
+        });
+        console.log(`📤 Đã đẩy ${messages.length} message (user) vào Kafka.`);
+      } else {
+        console.log('ℹ️ Không có user nào phù hợp để gửi.');
+      }
+
     } catch (error) {
-      console.error('❌ Lỗi trong cron job gửi mail:', error);
+      console.error('❌ Cron lỗi:', error);
     }
   });
 };
