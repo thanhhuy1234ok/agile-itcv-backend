@@ -1,9 +1,10 @@
 const express = require('express');
 const {port} =require('./configs/env.config.js');
 const mainRouter =  require('./routers/router.js');
-const sendJobNotificationsCron = require('./configs/sendJobNotifications.js')
 require('./configs/db.config.js');
 const sendJobNotificationsCron = require('../src/configs/sendJobNotifications.js')
+const runEmailConsumer = require('../src/kafka/consumers/emailConsumer.js');
+const startCheckLagCron = require('../src/kafka/checkLagCron.js');
 const app = express();
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -28,7 +29,10 @@ app.use('/uploads', express.static(path.join(__dirname,'../uploads')));
 
 app.use('/api/v1', mainRouter);
 
-// sendJobNotificationsCron();
+sendJobNotificationsCron();
+runEmailConsumer('Consumer-1');
+runEmailConsumer('Consumer-2');
+// startCheckLagCron();
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
