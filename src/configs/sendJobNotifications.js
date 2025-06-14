@@ -10,7 +10,7 @@ const sendJobNotificationsCron = () => {
     });
 
     for (const user of users) {
-      if (!user.email) continue;
+      // if (!user.email) continue;
       await sendUserToKafka(user._id);
     }
 

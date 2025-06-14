@@ -9,10 +9,13 @@ const runEmailConsumer = async (consumerName) => {
   await createConsumer('email-group', consumerName, async ({ message }) => {
     try {
       const { userId } = JSON.parse(message.value.toString());
+
       const user = await User.findById(userId);
       const jobNotification = await JobNotification.findOne({ userId });
 
-      if (!user?.email || !jobNotification?.emailNotificationsEnabled) return;
+      if (!user?.email || !jobNotification?.emailNotificationsEnabled) {
+        throw new Error(`⚠️ Không gửi được mail cho user ${userId}: thiếu email hoặc chưa bật thông báo`);
+      }
 
       const jobs = await Job.find({
         isActive: true,
@@ -25,7 +28,9 @@ const runEmailConsumer = async (consumerName) => {
         job.skill?.some(skill => userSkills.includes(skill))
       );
 
-      if (matchedJobs.length === 0) return;
+      if (matchedJobs.length === 0) {
+        throw new Error(`📭 Không có job phù hợp với user ${userId}`);
+      }
 
       const formattedJobs = matchedJobs.map(job => ({
         _id: job._id,
@@ -49,10 +54,9 @@ const runEmailConsumer = async (consumerName) => {
 
       console.log(`✅ ${consumerName} đã gửi mail đến ${user.email}`);
     } catch (err) {
-      console.error('❌ Lỗi xử lý message Kafka:', err);
+      throw err;
     }
   });
-  
 };
 
 module.exports = runEmailConsumer;
