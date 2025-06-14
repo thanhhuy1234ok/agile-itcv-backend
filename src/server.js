@@ -32,7 +32,7 @@ app.use('/api/v1', mainRouter);
 sendJobNotificationsCron();
 runEmailConsumer('Consumer-1');
 runEmailConsumer('Consumer-2');
-// startCheckLagCron();
+startCheckLagCron();
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);

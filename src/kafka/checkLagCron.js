@@ -16,7 +16,7 @@ const startCheckLagCron = () => {
     console.log(`\n📊 [${new Date().toLocaleString()}] Lag hiện tại:`);
 
     topicOffsets.forEach(({ partition, offset: latestOffset }) => {
-      const consumerPartitionOffset = consumerOffsets.find(p => p.partition === partition);
+      const consumerPartitionOffset = consumerOffsets[0].partitions.find(p => p.partition === partition);
       const committedOffset = consumerPartitionOffset?.offset || '0';
       const lag = parseInt(latestOffset) - parseInt(committedOffset);
 
