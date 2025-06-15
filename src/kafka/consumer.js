@@ -1,4 +1,5 @@
 const createKafka = require('./config');
+const { sendToRetryTopic } = require('../kafka/producer'); 
 
 const createConsumer = async (groupId, clientId, eachMessageHandler) => {
   const kafka = createKafka(clientId);
@@ -20,7 +21,17 @@ const createConsumer = async (groupId, clientId, eachMessageHandler) => {
         console.log(`✅ Đã commit offset ${offsetValue} cho partition ${partition} của ${clientId}`);
       } catch (err) {
         console.error('❌ Lỗi xử lý message Kafka:', err.message);
-        //đẩy lỗi đó vào topic khác để xử lý lỗi sau
+        try {
+          const { userId } = JSON.parse(message.value.toString());
+          if (userId) {
+            await sendToRetryTopic(userId);
+            console.log(`🔁 Đã gửi userId ${userId} vào retry-2m`);
+          } else {
+            console.warn('⚠️ Không có userId để retry');
+          }
+        } catch (e) {
+          console.error('⚠️ Không thể parse message value:', e.message);
+        }
       }
     },
   });

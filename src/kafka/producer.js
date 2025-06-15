@@ -4,20 +4,28 @@ const producer = kafka.producer();
 
 let isConnected = false;
 
-const sendUserToKafka = async (userId) => {
+const connectProducer = async () => {
   if (!isConnected) {
     await producer.connect();
     isConnected = true;
   }
+};
+
+const sendToKafka = async (topic, data) => {
+  await connectProducer();
 
   await producer.send({
-    topic: 'send-email',
-    messages: [
-      {
-        value: JSON.stringify({ userId }),
-      },
-    ],
+    topic,
+    messages: [{ value: JSON.stringify(data) }],
   });
+};
+
+const sendUserToKafka = async (userId) => {
+  return sendToKafka('send-email', { userId });
+};
+
+const sendToRetryTopic = async (userId) => {
+  return sendToKafka('retry-2m', { userId, retryAt: Date.now() });
 };
 
 process.on('SIGINT', async () => {
@@ -25,4 +33,7 @@ process.on('SIGINT', async () => {
   process.exit();
 });
 
-module.exports = sendUserToKafka;
+module.exports = {
+  sendUserToKafka,
+  sendToRetryTopic,
+};

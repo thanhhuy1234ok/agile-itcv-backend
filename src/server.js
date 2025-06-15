@@ -4,6 +4,7 @@ const mainRouter =  require('./routers/router.js');
 require('./configs/db.config.js');
 const sendJobNotificationsCron = require('../src/configs/sendJobNotifications.js')
 const runEmailConsumer = require('../src/kafka/consumers/emailConsumer.js');
+const runRetryConsumer = require('../src/kafka/consumers/retryEmailConsumer.js')
 const startCheckLagCron = require('../src/kafka/checkLagCron.js');
 const app = express();
 const cors = require('cors');
@@ -32,7 +33,10 @@ app.use('/api/v1', mainRouter);
 sendJobNotificationsCron();
 runEmailConsumer('Consumer-1');
 runEmailConsumer('Consumer-2');
-startCheckLagCron();
+
+runRetryConsumer('ConsumerRetry-2m')
+
+// startCheckLagCron();
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);

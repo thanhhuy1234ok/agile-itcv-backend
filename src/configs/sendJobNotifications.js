@@ -1,6 +1,6 @@
 const cron = require('node-cron');
 const User = require('../schema/user.schema');
-const sendUserToKafka = require('../kafka/producer');
+const { sendUserToKafka } = require('../kafka/producer');
 
 const sendJobNotificationsCron = () => {
   cron.schedule('* * * * *', async () => {
