@@ -3,7 +3,7 @@ require('dotenv').config();
 module.exports = {
     env: process.env.NODE_ENV || 'dev',
 
-    port: process.env.PORT || 8080,
+    port: process.env.PORT || 8081,
     
     dbUriDev: process.env.MONGODB_URI_DEV || '',
     dbUriProd: process.env.MONGODB_URI_PROD || '',
