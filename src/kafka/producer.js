@@ -29,8 +29,9 @@ const sendUserToKafka = async (userIds) => {
   return sendToKafka('send-email', payload);
 };
 
-const sendToRetryTopic = async (userId) => {
-  return sendToKafka('retry-2m', [{ userId, retryAt: Date.now() }]);
+const sendToRetryTopic = async (payload) => {
+  const dataArray = Array.isArray(payload) ? payload : [payload];
+  return sendToKafka('retry-2m', dataArray);
 };
 
 process.on('SIGINT', async () => {

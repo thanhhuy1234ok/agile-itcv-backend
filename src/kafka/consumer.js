@@ -1,16 +1,19 @@
 const createKafka = require('./config');
 const { sendToRetryTopic } = require('../kafka/producer');
 
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-
-// Hàm xử lý lỗi message và gửi sang retry topic
+// Hàm xử lý lỗi message và gửi sang retry-2m với retryCount = 1
 const handleMessageError = async (message, error) => {
   console.error('❌ Lỗi xử lý message Kafka:', error.message);
   try {
     const { userId } = JSON.parse(message.value.toString());
     if (userId) {
-      await sendToRetryTopic(userId);
-      console.log(`🔁 Đã gửi userId ${userId} vào retry-2m`);
+      const retryPayload = {
+        userId,
+        retryCount: 1,
+        retryAt: Date.now()
+      };
+      await sendToRetryTopic(retryPayload);
+      console.log(`🔁 Đã gửi userId ${userId} vào retry-2m (retryCount = 1)`);
     } else {
       console.warn('⚠️ Không có userId để retry');
     }
@@ -19,15 +22,9 @@ const handleMessageError = async (message, error) => {
   }
 };
 
-// Hàm tạo consumer dùng eachBatch
 const createConsumer = async (groupId, clientId, eachMessageHandler) => {
   const kafka = createKafka(clientId);
-
-  const consumer = kafka.consumer({
-    groupId,
-    // sessionTimeout: 10000, // 10s
-    // heartbeatInterval: 3000
-  });
+  const consumer = kafka.consumer({ groupId });
 
   await consumer.connect();
 
@@ -68,13 +65,14 @@ const createConsumer = async (groupId, clientId, eachMessageHandler) => {
           resolveOffset(message.offset);
           console.log(`✅ Đã xử lý message offset ${message.offset} từ partition ${partition}`);
         } catch (err) {
-          console.log("loi: ", err.message)
-          // await handleMessageError(message, err);
+          console.error(`❌ Lỗi xử lý message offset ${message.offset}:`, err.message);
+          await handleMessageError(message, err); 
+          resolveOffset(message.offset); 
         }
-        
+
         committed.push(parseInt(message.offset) + 1);
       }
-      
+
       await commitOffsetsIfNecessary();
       await heartbeat();
       console.log(`📬 Đã commit offsets [${committed.join(', ')}] cho partition ${partition}`);

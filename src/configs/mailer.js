@@ -9,9 +9,13 @@ const mailerOption = require('../configs/mailer.option.js');
 const transporter = nodemailer.createTransport({
     host: configs.mailer.service,
     secure: false,
+    port: 587,
     auth: {
         user: configs.mailer.user,
         pass: configs.mailer.pass,
+    },
+    tls: {
+        rejectUnauthorized: false, 
     }
 });
 
