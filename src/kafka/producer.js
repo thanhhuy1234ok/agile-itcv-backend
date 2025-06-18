@@ -11,21 +11,26 @@ const connectProducer = async () => {
   }
 };
 
-const sendToKafka = async (topic, data) => {
+const sendToKafka = async (topic, dataArray) => {
   await connectProducer();
+
+  const messages = dataArray.map(data => ({
+    value: JSON.stringify(data)
+  }));
 
   await producer.send({
     topic,
-    messages: [{ value: JSON.stringify(data) }],
+    messages,
   });
 };
 
-const sendUserToKafka = async (userId) => {
-  return sendToKafka('send-email', { userId });
+const sendUserToKafka = async (userIds) => {
+  const payload = userIds.map(userId => ({ userId }));
+  return sendToKafka('send-email', payload);
 };
 
 const sendToRetryTopic = async (userId) => {
-  return sendToKafka('retry-2m', { userId, retryAt: Date.now() });
+  return sendToKafka('retry-2m', [{ userId, retryAt: Date.now() }]);
 };
 
 process.on('SIGINT', async () => {

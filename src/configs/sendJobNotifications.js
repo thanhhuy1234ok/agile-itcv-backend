@@ -4,18 +4,23 @@ const { sendUserToKafka } = require('../kafka/producer');
 
 const sendJobNotificationsCron = () => {
   cron.schedule('* * * * *', async () => {
-    const users = await User.find({
-      isDeleted: false,
-      'role.name': 'NORMAL USER',
-    });
+    try {
+      const users = await User.find({
+        isDeleted: false,
+        'role.name': 'NORMAL USER',
+      });
 
-    for (const user of users) {
-      // if (!user.email) continue;
-      await sendUserToKafka(user._id);
+      const userIds = users.map(user => user._id);
+
+      if (userIds.length > 0) {
+        await sendUserToKafka(userIds); // Gửi 1 batch
+        console.log(`📤 Đã đẩy ${userIds.length} user vào Kafka topic 'send-email' (1 batch)`);
+      }
+    } catch (err) {
+      console.error('❌ Lỗi khi gửi user vào Kafka:', err.message);
     }
-
-    console.log('📤 Đã đẩy toàn bộ user vào Kafka topic `send-email`');
   });
 };
+
 
 module.exports = sendJobNotificationsCron;
