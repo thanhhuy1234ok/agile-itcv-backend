@@ -30,11 +30,11 @@ app.use('/uploads', express.static(path.join(__dirname,'../uploads')));
 
 app.use('/api/v1', mainRouter);
 
-sendJobNotificationsCron();
-runEmailConsumer('Consumer-1');
-runEmailConsumer('Consumer-2');
+// sendJobNotificationsCron();
+// runEmailConsumer('Consumer-1');
+// runEmailConsumer('Consumer-2');
 
-runRetryConsumer('ConsumerRetry-2m')
+// runRetryConsumer('ConsumerRetry-2m')
 
 // startCheckLagCron();
 
