@@ -15,8 +15,8 @@ companyRouter.post(
 companyRouter.get("/", companyController.getAllCompanies);
 companyRouter.get(
   "/:id",
-  authMiddleware,
-  checkPermission,
+  // authMiddleware,
+  // checkPermission,
   companyController.getCompanyById
 );
 companyRouter.put("/:id", authMiddleware, companyController.updateCompany);
