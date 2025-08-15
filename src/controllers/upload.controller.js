@@ -28,13 +28,16 @@ const uploadFile = (req, res) => {
         { new: true }
       );
 
+      const userToSend = updatedUser.toObject();
+      delete userToSend.password;
+
       return sendSuccess(
         res,
         "Tải file thành công và cập nhật CV",
         {
           url: file.path,
           originalName: file.originalname,
-          user: updatedUser,
+          user: userToSend,
         },
         statusCodes.OK
       );
