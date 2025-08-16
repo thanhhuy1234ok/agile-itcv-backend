@@ -86,31 +86,19 @@ const getUserById = async (userId) => {
   }
 };
 
-const updateUser = async (userId, updateData, currentUser = null) => {
+const updateUser = async (updateData, user) => {
   try {
-    if (!userId) throw new Error("Thiếu userId");
+    if (!user?._id) throw new Error("Thiếu thông tin user");
 
-    if (updateData.role && typeof updateData.role === "string") {
-      const role = await Role.findById(updateData.role);
-      if (!role) throw new Error("Không tìm thấy vai trò");
-
-      updateData.role = {
-        _id: role._id,
-        name: role.name,
-      };
-    }
-
-    if (currentUser) {
-      updateData.updatedBy = {
-        _id: currentUser._id,
-        email: currentUser.email,
-      };
-    }
+    updateData.updatedBy = {
+      _id: user._id,
+      email: user.email,
+    };
 
     updateData.updatedAt = new Date();
 
     const updatedUser = await User.findOneAndUpdate(
-      { _id: userId, isDeleted: false },
+      { _id: user._id, isDeleted: false },
       updateData,
       { new: true }
     );
